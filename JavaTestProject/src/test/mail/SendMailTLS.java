@@ -9,7 +9,13 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
- 
+
+/**
+ * Important:
+ * in order for this to work you need to enable access for less secure apps in this gmail account
+ * @author Leo
+ *
+ */
 public class SendMailTLS {
 
 	final static String username = "leoio1953@gmail.com";
