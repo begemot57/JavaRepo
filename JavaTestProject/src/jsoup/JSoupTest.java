@@ -31,7 +31,7 @@ public class JSoupTest {
 		List<String> newAdds;
 		try {
 			while (true) {
-				doc = Jsoup.connect(all_cars).get();
+				doc = Jsoup.connect(all_cars).timeout(5000).get();
 				if(first_add == null)
 					first_add = getAElementFromList("test-1");
 
