@@ -17,9 +17,9 @@ public class JSoupTest {
 
 	static Document doc;
 	static final String url_big_pics = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004";
-	static final String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004&sort=AGE+DESC&source=ALL&start=0";
+	static final String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
 	static final String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
-	static final int sleep_time = 3000;
+	static final int sleep_time = 30000;
 
 	public static void main(String[] args) {
 		JSoupTest test = new JSoupTest();
@@ -31,9 +31,13 @@ public class JSoupTest {
 		List<String> newAdds;
 		try {
 			while (true) {
-				doc = Jsoup.connect(all_cars).timeout(5000).get();
-				if(first_add == null)
+				doc = Jsoup.connect(url_list).timeout(5000).get();
+				if(first_add == null){
+					System.out.println("Start monitoring");
+					SendMailTLS.send("leoio1953@gmail.com", "Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+url_list+
+							"\nMonitoring interval: "+sleep_time);
 					first_add = getAElementFromList("test-1");
+				}
 
 				newAdds = new ArrayList<String>(10);
 				String currAdd;
