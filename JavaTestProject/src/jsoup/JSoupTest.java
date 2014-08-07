@@ -1,8 +1,8 @@
 package jsoup;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +21,7 @@ public class JSoupTest {
 	static final String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
 	static final String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
 	static final int sleep_time = 30000;
-	static FileWriter out;
+	static PrintWriter out;
 
 	public static void main(String[] args) {
 		JSoupTest test = new JSoupTest();
@@ -29,14 +29,15 @@ public class JSoupTest {
 	}
 
 	private void run() {
-		out = new FileWriter("JSoupTestOutput.txt");
 		String first_add = null;
 		List<String> newAdds;
 		try {
+			out = new PrintWriter(new File("JSoupTestOutput.txt"));
 			while (true) {
 				doc = Jsoup.connect(url_list).timeout(5000).get();
 				if(first_add == null){
-					out.write("Start monitoring");
+					out.write("Start monitoring\n");
+					out.flush();
 					SendMailTLS.send("leoio1953@gmail.com", "Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+url_list+
 							"\nMonitoring interval: "+sleep_time);
 					first_add = getAElementFromList("test-1");
@@ -58,17 +59,19 @@ public class JSoupTest {
 				}
 				Thread.sleep(sleep_time);
 			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace(out);
+		} finally {
+			if (out != null) {
+				out.close();
+			}
 		}
 	}
 
-	private void sendMail(List<String> newAdds){
-		out.write("send email");
-		out.write(Arrays.toString(newAdds.toArray()));
+	private void sendMail(List<String> newAdds) throws Exception{
+		out.write("send email\n");
+		out.write(Arrays.toString(newAdds.toArray())+"\n");
+		out.flush();
 //		System.out.println("send email");
 //		System.out.println(Arrays.toString(newAdds.toArray()));
 		SendMailTLS.send("leoio1953@gmail.com", "New Donedeal.ie adds", Arrays.toString(newAdds.toArray()));	

@@ -12,9 +12,13 @@ public class PrintIntoFileTest {
 		FileWriter out = null;
 		try {
 			out = new FileWriter("output/output.txt");
-			out.write("test");
+			out.write("test 2");
+			out.flush();
+			while(true){
+				Thread.sleep(10000);
+			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
