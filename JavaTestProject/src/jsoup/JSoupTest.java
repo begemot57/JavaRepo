@@ -36,7 +36,7 @@ public class JSoupTest {
 			while (true) {
 				doc = Jsoup.connect(url_list).timeout(5000).get();
 				if(first_add == null){
-					out.write("Start monitoring\n");
+					out.write("Start monitoring bla\n");
 					out.flush();
 					SendMailTLS.send("leoio1953@gmail.com", "Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+url_list+
 							"\nMonitoring interval: "+sleep_time);
@@ -63,6 +63,8 @@ public class JSoupTest {
 			e.printStackTrace(out);
 		} finally {
 			if (out != null) {
+				out.write("Close file");
+				out.flush();
 				out.close();
 			}
 		}
