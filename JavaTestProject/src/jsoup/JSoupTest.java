@@ -42,7 +42,7 @@ public class JSoupTest {
 				counter++;
 				doc = Jsoup.connect(url_list).timeout(5000).get();
 				if(first_add == null){
-					out.write("Start monitoring bla\n");
+					out.write("Start monitoring\n");
 					cal = Calendar.getInstance();
 					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
