@@ -3,8 +3,10 @@ package jsoup;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import org.jsoup.Jsoup;
@@ -31,12 +33,18 @@ public class JSoupTest {
 	private void run() {
 		String first_add = null;
 		List<String> newAdds;
+		Calendar cal;
+    	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
+    	int counter = 0;
 		try {
 			out = new PrintWriter(new File("JSoupTestOutput.txt"));
 			while (true) {
+				counter++;
 				doc = Jsoup.connect(url_list).timeout(5000).get();
 				if(first_add == null){
 					out.write("Start monitoring bla\n");
+					cal = Calendar.getInstance();
+					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
 					SendMailTLS.send("leoio1953@gmail.com", "Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+url_list+
 							"\nMonitoring interval: "+sleep_time);
@@ -56,6 +64,12 @@ public class JSoupTest {
 				if(!newAdds.isEmpty()){
 					first_add = newAdds.get(0);
 					sendMail(newAdds);
+				}
+				if(counter == 10){
+					cal = Calendar.getInstance();
+					out.write(sdf.format(cal.getTime())+"\n");
+					out.flush();
+					counter = 0;
 				}
 				Thread.sleep(sleep_time);
 			}
