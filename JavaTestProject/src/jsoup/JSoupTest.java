@@ -37,7 +37,9 @@ public class JSoupTest {
     	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
     	int counter = 0;
 		try {
-			out = new PrintWriter(new File("JSoupTestOutput.txt"));
+			cal = Calendar.getInstance();
+			String log_file_name = sdf.format(cal.getTime()).replace(" ", "").concat(".log");
+			out = new PrintWriter(new File(log_file_name));
 			while (true) {
 				counter++;
 				doc = Jsoup.connect(url_list).timeout(5000).get();
