@@ -2,6 +2,7 @@ package test.calendar;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class ExtractHourTest {
@@ -10,6 +11,7 @@ public class ExtractHourTest {
 		Calendar cal;
     	SimpleDateFormat sdf1 = new SimpleDateFormat("E yyyy.MM.dd HH:mm:ss");
     	cal = Calendar.getInstance();
+    	System.out.println("in day lignt time: "+TimeZone.getTimeZone("UTC").inDaylightTime(new Date()));
 //    	cal = Calendar.getInstance();
 		System.out.println("current time: "+sdf1.format(cal.getTime()));
 		System.out.println("hours: "+cal.get(Calendar.HOUR_OF_DAY));
