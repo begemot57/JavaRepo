@@ -42,7 +42,7 @@ public class JSoupTest {
 			out = new PrintWriter(new File(log_file_name));
 			while (true) {
 				counter++;
-				doc = Jsoup.connect(url_list).timeout(10000).get();
+				doc = Jsoup.connect(url_list).timeout(60000).get();
 				if(first_add == null){
 					out.write("Start monitoring\n");
 					cal = Calendar.getInstance();
