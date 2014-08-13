@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,7 +39,7 @@ public class JSoupTest {
     	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
     	int counter = 0;
 		try {
-			cal = Calendar.getInstance();
+			cal = Calendar.getInstance(TimeZone.getTimeZone("Eire"));
 			String log_file_name = sdf.format(cal.getTime()).replace(" ", "").concat(".log");
 			out = new PrintWriter(new File(log_file_name));
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
@@ -72,7 +73,7 @@ public class JSoupTest {
 					sendMail(newAdds);
 				}
 				if(counter == 10){
-					cal = Calendar.getInstance();
+					cal = Calendar.getInstance(TimeZone.getTimeZone("Eire"));
 					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
 					counter = 0;
