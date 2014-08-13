@@ -3,6 +3,7 @@ package jsoup;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +41,9 @@ public class JSoupTest {
 			cal = Calendar.getInstance();
 			String log_file_name = sdf.format(cal.getTime()).replace(" ", "").concat(".log");
 			out = new PrintWriter(new File(log_file_name));
+			String processId = ManagementFactory.getRuntimeMXBean().getName();
+			out.write("Current process id: "+processId+"\n");
+			out.flush();
 			while (true) {
 				counter++;
 				doc = Jsoup.connect(url_list).timeout(60000).get();
