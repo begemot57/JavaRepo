@@ -36,7 +36,7 @@ public class JSoupTest {
 		String first_add = null;
 		List<String> newAdds;
 		Calendar cal;
-    	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
+    	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' HH:mm:ss");
     	int counter = 0;
 		try {
 			cal = Calendar.getInstance();
