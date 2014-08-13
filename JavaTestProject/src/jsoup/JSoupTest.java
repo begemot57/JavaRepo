@@ -39,7 +39,7 @@ public class JSoupTest {
     	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
     	int counter = 0;
 		try {
-			cal = Calendar.getInstance(TimeZone.getTimeZone("Eire"));
+			cal = Calendar.getInstance();
 			String log_file_name = sdf.format(cal.getTime()).replace(" ", "").concat(".log");
 			out = new PrintWriter(new File(log_file_name));
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
@@ -73,7 +73,7 @@ public class JSoupTest {
 					sendMail(newAdds);
 				}
 				if(counter == 10){
-					cal = Calendar.getInstance(TimeZone.getTimeZone("Eire"));
+					cal = Calendar.getInstance();
 					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
 					counter = 0;
