@@ -20,6 +20,18 @@ public class ExtractHourTest {
 		
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy.MM.dd");
 		System.out.println("date: "+sdf2.format(cal.getTime()));
+		
+		SimpleDateFormat sdf3 = new SimpleDateFormat("yyyyMMdd'_'HHmm");
+		String s = sdf3.format(cal.getTime());
+		System.out.println("filename: "+s);
+		String hour = s.substring(s.length()-4, s.length()-2);
+		System.out.println("substr: "+hour);
+		int h = 12;
+		if(hour.contains(Integer.toString(h))){
+			System.out.println("yes");
+		}
+		
+		
 	}
 
 }
