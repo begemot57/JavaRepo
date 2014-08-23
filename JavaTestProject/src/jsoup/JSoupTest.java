@@ -24,8 +24,10 @@ public class JSoupTest {
 	static final String url_big_pics = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004";
 	static final String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
 	static final String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
+	static final String cork_cars_less_2000_e = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_to]=2.5&ranges[price_to]=2000&sort=AGE+DESC&source=ALL&start=0";
 	static final int sleep_time = 30000;
 	static PrintWriter out;
+	static boolean sendEmail = true;
 
 	public static void main(String[] args) {
 		JSoupTest test = new JSoupTest();
@@ -36,12 +38,12 @@ public class JSoupTest {
 		String first_add = null;
 		List<String> newAdds;
 		Calendar cal;
-    	SimpleDateFormat sdf = new SimpleDateFormat("E yyyy.MM.dd 'at' HH:mm:ss");
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HHmmss");
     	int counter = 0;
 		try {
 			cal = Calendar.getInstance();
 			String log_file_name = sdf.format(cal.getTime()).replace(" ", "").concat(".log");
-			out = new PrintWriter(new File(log_file_name));
+			out = new PrintWriter(new File("testlogblabla.log"));
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
 			out.write("Current process id: "+processId+"\n");
 			out.flush();
@@ -53,7 +55,7 @@ public class JSoupTest {
 					cal = Calendar.getInstance();
 					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
-					SendMailTLS.send("leoio1953@gmail.com", "Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+url_list+
+					sendMail("Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+url_list+
 							"\nMonitoring interval: "+sleep_time);
 					first_add = getAElementFromList("test-1");
 				}
@@ -70,7 +72,7 @@ public class JSoupTest {
 				}
 				if(!newAdds.isEmpty()){
 					first_add = newAdds.get(0);
-					sendMail(newAdds);
+					sendMail("New Donedeal.ie adds", Arrays.toString(newAdds.toArray()));
 				}
 				if(counter == 10){
 					cal = Calendar.getInstance();
@@ -91,13 +93,15 @@ public class JSoupTest {
 		}
 	}
 
-	private void sendMail(List<String> newAdds) throws Exception{
+	private void sendMail(String subject, String newAdds) throws Exception{
+		if(!sendEmail)
+			return;
 		out.write("send email\n");
-		out.write(Arrays.toString(newAdds.toArray())+"\n");
+		out.write(newAdds+"\n");
 		out.flush();
 //		System.out.println("send email");
 //		System.out.println(Arrays.toString(newAdds.toArray()));
-		SendMailTLS.send("leoio1953@gmail.com", "New Donedeal.ie adds", Arrays.toString(newAdds.toArray()));	
+		SendMailTLS.send("leoio1953@gmail.com", subject, newAdds);	
 	}
 	
 	private String getAElementFromList(String id) {
