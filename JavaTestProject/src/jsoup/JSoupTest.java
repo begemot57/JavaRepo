@@ -24,7 +24,7 @@ public class JSoupTest {
 	static final String url_big_pics = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004";
 	static final String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
 	static final String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
-	static final String cork_cars_less_2000_e = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_to]=2.5&ranges[price_to]=2000&sort=AGE+DESC&source=ALL&start=0";
+	static final String URL = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_to]=2.5&ranges[price_to]=2000&sort=AGE+DESC&source=ALL&start=0";
 	static final int sleep_time = 30000;
 	static PrintWriter out;
 	static boolean sendEmail = true;
@@ -42,14 +42,14 @@ public class JSoupTest {
     	int counter = 0;
 		try {
 			cal = Calendar.getInstance();
-			String log_file_name = sdf.format(cal.getTime()).replace(" ", "").concat(".log");
-			out = new PrintWriter(new File("testlogblabla.log"));
+			String log_file_name = sdf.format(cal.getTime()).concat(".log");
+			out = new PrintWriter(new File(log_file_name));
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
 			out.write("Current process id: "+processId+"\n");
 			out.flush();
 			while (true) {
 				counter++;
-				doc = Jsoup.connect(url_list).timeout(60000).get();
+				doc = Jsoup.connect(URL).timeout(60000).get();
 				if(first_add == null){
 					out.write("Start monitoring\n");
 					cal = Calendar.getInstance();
