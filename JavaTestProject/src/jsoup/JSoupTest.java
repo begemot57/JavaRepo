@@ -21,16 +21,18 @@ import test.mail.SendMailTLS;
 public class JSoupTest {
 
 	static Document doc;
-//	static final String url_big_pics = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004";
-//	static final String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
-//	static final String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
-	static final String URL = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_from]=1.4&ranges[engine_to]=2.5&ranges[price_from]=1000&ranges[price_to]=2000&ranges[year_from]=2000&sort=AGE+DESC&source=ALL&start=0";
+//	String url_big_pics = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004";
+//	String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
+//	String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
+	String URL = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_from]=1.4&ranges[engine_to]=2.5&ranges[price_from]=1000&ranges[price_to]=2000&ranges[year_from]=2000&sort=AGE+DESC&source=ALL&start=0";
 	static final int sleep_time = 30000;
 	static PrintWriter out;
 	static boolean sendEmail = true;
 
 	public static void main(String[] args) {
 		JSoupTest test = new JSoupTest();
+		if(args.length>0)
+			test.setURL(args[0]);
 		test.run();
 	}
 
@@ -45,7 +47,7 @@ public class JSoupTest {
 			String log_file_name = sdf.format(cal.getTime()).concat(".log");
 			out = new PrintWriter(new File(log_file_name));
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
-			out.write("Current process id: "+processId+"\n");
+			out.write(processId+"\n");
 			out.flush();
 			while (true) {
 				counter++;
@@ -143,4 +145,12 @@ public class JSoupTest {
 		}
 	}
 
+	public String getURL() {
+		return URL;
+	}
+
+	public void setURL(String url) {
+		URL = url;
+	}
+	
 }
