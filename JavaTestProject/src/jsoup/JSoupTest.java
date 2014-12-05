@@ -64,8 +64,8 @@ public class JSoupTest {
 					cal = Calendar.getInstance();
 					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
-//					sendMail("Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+URL+
-//							"\nMonitoring interval: "+sleep_time);
+					sendMail("Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+URL+
+							"\nMonitoring interval: "+sleep_time);
 					first_add = getAElementFromList("test-1");
 				}
 
