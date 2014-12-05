@@ -24,7 +24,7 @@ public class JSoupTest {
 //	String url_big_pics = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2004";
 //	String url_list = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&filters[transmission]=Automatic&ranges[engine_to]=2.5&ranges[price_to]=5000&ranges[year_from]=2001&sort=AGE+DESC&source=ALL&start=0";
 //	String all_cars = "http://cars.donedeal.ie/find/cars/for-sale/Ireland/?display=list&sort=AGE+DESC&source=ALL&start=0";
-	String URL = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?display=list&ranges[engine_from]=1.4&ranges[engine_to]=2.5&ranges[price_from]=1000&ranges[price_to]=2000&ranges[year_from]=2000&sort=AGE+DESC&source=ALL&start=0";
+	String URL = "http://cars.donedeal.ie/find/cars/for-sale/Cork/?ranges[price_to]=1200&sort=AGE+DESC";
 	static final int sleep_time = 30000;
 	static PrintWriter out;
 	static boolean sendEmail = true;
