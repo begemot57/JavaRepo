@@ -64,7 +64,6 @@ public class JSoupTest {
 					cal = Calendar.getInstance();
 					out.write(sdf.format(cal.getTime())+"\n");
 					out.flush();
-					System.out.println("gaga");
 					sendMail("Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+URL+
 							"\nMonitoring interval: "+sleep_time);
 					first_add = getAElementFromList("test-1");
@@ -119,7 +118,6 @@ public class JSoupTest {
 		Element test1 = doc.getElementById(id);
 		Element a = test1.select("td:nth-child(3) div span:nth-child(5) a")
 				.first();
-		System.out.println(a.attr("href"));
 		return a.attr("href");
 	}
 
