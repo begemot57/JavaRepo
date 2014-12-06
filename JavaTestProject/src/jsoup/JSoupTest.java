@@ -67,6 +67,7 @@ public class JSoupTest {
 					sendMail("Start monitoring Donedeal.ie adds", "Started monitoring this search: \n"+URL+
 							"\nMonitoring interval: "+sleep_time);
 					first_add = getAElementFromList("test-1");
+					
 				}
 
 				newAdds = new ArrayList<String>(10);
