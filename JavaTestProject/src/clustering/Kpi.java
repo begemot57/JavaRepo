@@ -2,7 +2,7 @@ package clustering;
 
 import java.util.Arrays;
 
-public class Kpi{
+public class Kpi extends Clusterable{
 	private Double[] values;
 	
 	public Kpi(Double[] values){

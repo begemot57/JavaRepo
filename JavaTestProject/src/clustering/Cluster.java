@@ -1,69 +1,54 @@
 package clustering;
 
-public class Cluster {
-	//only save the index of centroid here
-	private int centroidIndex;
-	//this has all the kpis in this cluster incuding centroid
-	private Kpi[] kpis;
-	private DistanceMeasure distMeasure;
-	private double threshold;
-	
-	public Cluster(){
-	}
-	
-	public Cluster(int centroidIndex, Kpi[] kpis, DistanceMeasure distMeasure,
-			double threshold) {
-		super();
-		this.centroidIndex = centroidIndex;
-		this.kpis = kpis;
-		this.distMeasure = distMeasure;
-		this.threshold = threshold;
-	}
 
-	public int getCentroid() {
+
+public class Cluster {
+	//this is index of clustring.items which is centroid of this cluser
+	private int centroidIndex;
+	//those are the indexes of clustering.items which are members of this cluster
+	private int[] memberIndexes;
+	private Clustering clustering;
+	
+	public Cluster(Clustering clustering){
+		this.clustering = clustering;
+	}
+	
+	public int getCentroidIndex() {
 		return centroidIndex;
 	}
-	public void setCentroid(int centroidIndex) {
+
+	public void setCentroidIndex(int centroidIndex) {
 		this.centroidIndex = centroidIndex;
 	}
-	public Kpi[] getKpis() {
-		return kpis;
+
+	public int[] getMemberIndexes() {
+		return memberIndexes;
 	}
-	public void setKpis(Kpi[] kpis) {
-		this.kpis = kpis;
+
+	public void setMemberIndexes(int[] memberIndexes) {
+		this.memberIndexes = memberIndexes;
 	}
-	
-	/**
-	 * returns false if centroid wasn't moved
-	 * @return
-	 */
-	public boolean recalculateCentroid(){
-		double[] possibleCentroidDistances = new double[kpis.length];
-		for (int i = 0; i < kpis.length; i++) {
-			for (int j = 0; j < kpis.length-i; j++) {
-				double currDist = this.distMeasure.distance(kpis[i], kpis[j]);
-				possibleCentroidDistances[i] += currDist;
-				possibleCentroidDistances[j] += currDist;
+
+	public int findCentroid(){
+		double[] distToAllOtherKpis = new double[memberIndexes.length];
+		for (int i = 0; i < memberIndexes.length; i++) {
+			for (int j = i+1; j < memberIndexes.length; j++) {
+				double currDist = this.clustering.getDistMeasure().distance(
+						this.clustering.getItems()[i], this.clustering.getItems()[j]);
+				distToAllOtherKpis[i] += currDist;
+				distToAllOtherKpis[j] += currDist;
 			}
 		}
 		//find min value index in possibleCentroidDistances
 		double min = Double.MAX_VALUE;
-		int index = 0;
-		for (int i = 0; i < possibleCentroidDistances.length; i++) {
-			if(possibleCentroidDistances[i] < min){
-				min = possibleCentroidDistances[i];
-				index = i;
+		int minValIndex = 0;
+		for (int i = 0; i < distToAllOtherKpis.length; i++) {
+			if(distToAllOtherKpis[i] < min){
+				min = distToAllOtherKpis[i];
+				minValIndex = i;
 			}
 		}
-		//check if we need to move centroid
-		if(index == this.centroidIndex)
-			return false;
-		double distFromOldAndNewCentroid = this.distMeasure.distance(kpis[index], kpis[this.centroidIndex]);
-		if(distFromOldAndNewCentroid < this.threshold)
-			return false;
-		else{
-			this.centroidIndex = index;
-			return true;
-		}
+		this.centroidIndex = memberIndexes[minValIndex];
+		return this.centroidIndex;
 	}
 }
