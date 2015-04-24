@@ -2,11 +2,11 @@ package clustering.tests;
 
 import java.util.Random;
 
-import clustering.Clustering;
+import clustering.KMeansClustering;
 import clustering.DistanceMeasure;
 import clustering.EuclideanDistance;
-import clustering.Kpi;
-import clustering.KpiDistance;
+import clustering.Metric;
+import clustering.MetricDistance;
 import clustering.Utils;
 
 public class Test {
@@ -19,23 +19,23 @@ public class Test {
 	void run(){
 		int numberOfClusters = 3;
 		double threshold = 10;
-		int numberOfIterations = 10000;
+		int numberOfIterations = 1000;
 		DistanceMeasure distMeasure = new EuclideanDistance();
-		Kpi[] items = randomKpiGenerator(1000, 3);
+		Metric[] items = randomKpiGenerator(100, 2);
 //		Utils.printKpis("points:", items);
-		Clustering clustering = new Clustering(numberOfClusters, threshold, numberOfIterations, distMeasure, items);
+		KMeansClustering clustering = new KMeansClustering(numberOfClusters, threshold, numberOfIterations, distMeasure, items);
 		clustering.cluster();
 	}
 	
-	Kpi[] randomKpiGenerator(int numberOfItems, int kpiSize){
+	Metric[] randomKpiGenerator(int numberOfItems, int metricsSize){
 		Random r = new Random();
-		Kpi[] kpis = new Kpi[numberOfItems]; 
+		Metric[] kpis = new Metric[numberOfItems]; 
 		for (int i = 0; i < numberOfItems; i++) {
-			Double[] kpi = new Double[kpiSize];
-			for (int j = 0; j < kpiSize; j++) {
-				kpi[j] = 1000 * r.nextDouble();
+			double[] metric = new double[metricsSize];
+			for (int j = 0; j < metricsSize; j++) {
+				metric[j] = 1000 * r.nextDouble();
 			}
-			kpis[i] = new Kpi(kpi);
+			kpis[i] = new Metric(metric);
 		}
 		return kpis;
 	}

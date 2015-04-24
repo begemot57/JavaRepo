@@ -1,5 +1,5 @@
 package clustering;
 
 public abstract class Clusterable {
-	public abstract Comparable<?>[] getValues();
+	public abstract double[] getValues();
 }
