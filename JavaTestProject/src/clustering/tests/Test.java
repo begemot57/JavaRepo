@@ -21,22 +21,45 @@ public class Test {
 		double threshold = 10;
 		int numberOfIterations = 1000;
 		DistanceMeasure distMeasure = new EuclideanDistance();
-		Metric[] items = randomKpiGenerator(100, 2);
-//		Utils.printKpis("points:", items);
-		KMeansClustering clustering = new KMeansClustering(numberOfClusters, threshold, numberOfIterations, distMeasure, items);
+		Metric[] metrics = randomMetricGeneratorDiffLevels(1000, 100);
+//		Utils.printMetrics("metrics:", metrics);
+		KMeansClustering clustering = new KMeansClustering(numberOfClusters, threshold, numberOfIterations, distMeasure, metrics);
 		clustering.cluster();
 	}
 	
-	Metric[] randomKpiGenerator(int numberOfItems, int metricsSize){
+	Metric[] randomMetricGenerator(int numberOfItems, int dimension){
 		Random r = new Random();
-		Metric[] kpis = new Metric[numberOfItems]; 
+		Metric[] metrics = new Metric[numberOfItems]; 
 		for (int i = 0; i < numberOfItems; i++) {
-			double[] metric = new double[metricsSize];
-			for (int j = 0; j < metricsSize; j++) {
+			double[] metric = new double[dimension];
+			for (int j = 0; j < dimension; j++) {
 				metric[j] = 1000 * r.nextDouble();
 			}
-			kpis[i] = new Metric(metric);
+			metrics[i] = new Metric(metric);
 		}
-		return kpis;
+		return metrics;
+	}
+	
+	Metric[] randomMetricGeneratorDiffLevels(int numberOfItems, int dimension){
+		Random r = new Random();
+		Metric[] metrics = new Metric[numberOfItems]; 
+		for (int i = 0; i < numberOfItems; i++) {
+			double[] metric = new double[dimension];
+			if(i < 333){
+				for (int j = 0; j < dimension; j++) {
+					metric[j] = 0 + (100 - 0) * r.nextDouble();
+				}
+			} else if(i < 666){
+				for (int j = 0; j < dimension; j++) {
+					metric[j] = 400 + (500 - 400) * r.nextDouble();
+				}
+			} else{
+				for (int j = 0; j < dimension; j++) {
+					metric[j] = 900 + (1000 - 900) * r.nextDouble();
+				}
+			}
+			metrics[i] = new Metric(metric);
+		}
+		return metrics;
 	}
 }

@@ -32,7 +32,7 @@ public class KMeansClustering {
 	public void cluster(){
 		//compute first N centroids
 		//int[] centroidIndexes = new int[]{0,1,5};//getRandomCentroids();
-//		double[][] centroids = new double[][]{{1,1},{2,2},{100,100}};
+//		double[][] centroids = new double[][]{{344,710},{308,719},{458,240}};
 		double[][] centroids = getRandomCentroids();
 		double[][] newCentroids;
 		Utils.printDoubleMatrix("first centroids: ", centroids);
@@ -105,6 +105,7 @@ public class KMeansClustering {
 		for (int i = 0; i < items.length; i++) {
 			closestCentroidtoItemArray[i] = getClosestCentroid(i, centroids);
 		}
+//		System.out.println("closestCentroidtoItemArray: "+Arrays.toString(closestCentroidtoItemArray));
 		//create clusters
 		for (int i = 0; i < centroids.length; i++) {
 			List<Integer> listOfClusterMembers = new ArrayList<Integer>();
@@ -128,9 +129,10 @@ public class KMeansClustering {
 		for (int i = 0; i < centroids.length; i++) {
 			double dist = 0;
 			for (int j = 0; j < this.dimension; j++) {
-				dist += Math.pow(Math.abs((Double)this.items[itemIndex].getValues()[j]-centroids[i][j]), 2);
+				dist += Math.pow(Math.abs(this.items[itemIndex].getValues()[j]-centroids[i][j]), 2);
 			}
-			if(Math.sqrt(dist) < min){
+			dist = Math.sqrt(dist);
+			if(dist < min){
 				min = dist;
 				minValIndex = i;
 			}
