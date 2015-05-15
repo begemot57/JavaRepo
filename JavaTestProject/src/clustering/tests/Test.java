@@ -1,6 +1,11 @@
 package clustering.tests;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import test.draw.GraphPanel;
 
 import clustering.KMeansClustering;
 import clustering.DistanceMeasure;
@@ -43,23 +48,31 @@ public class Test {
 	Metric[] randomMetricGeneratorDiffLevels(int numberOfItems, int dimension){
 		Random r = new Random();
 		Metric[] metrics = new Metric[numberOfItems]; 
+		List<List<Double>> lines = new ArrayList<List<Double>>();
+		List<Double> line;
 		for (int i = 0; i < numberOfItems; i++) {
+			 line = new ArrayList<Double>();
 			double[] metric = new double[dimension];
 			if(i < 333){
 				for (int j = 0; j < dimension; j++) {
-					metric[j] = 0 + (100 - 0) * r.nextDouble();
+					metric[j] = 0 + (10 - 0) * r.nextDouble();
+					line.add(metric[j]);
 				}
 			} else if(i < 666){
 				for (int j = 0; j < dimension; j++) {
-					metric[j] = 400 + (500 - 400) * r.nextDouble();
+					metric[j] = 40 + (50 - 40) * r.nextDouble();
+					line.add(metric[j]);
 				}
 			} else{
 				for (int j = 0; j < dimension; j++) {
-					metric[j] = 900 + (1000 - 900) * r.nextDouble();
+					metric[j] = 90 + (100 - 90) * r.nextDouble();
+					line.add(metric[j]);
 				}
 			}
 			metrics[i] = new Metric(metric);
+			lines.add(line);
 		}
+		GraphPanel.drawLines(lines);
 		return metrics;
 	}
 }
