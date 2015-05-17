@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import test.draw.GraphPanel;
+
 public class KMeansClustering {
 	private int numberOfClusters;
 	private double threshold;
@@ -45,8 +47,18 @@ public class KMeansClustering {
 			createClusters(centroids);
 			newCentroids = adjustCentroidForAllClusters();
 			Utils.printDoubleMatrix("new centroids: ", newCentroids);
-			if(!centroidsMoved(newCentroids, centroids))
+			if(!centroidsMoved(newCentroids, centroids)){
+				for (int i = 0; i < newCentroids.length; i++) {
+					List<List<Double>> lines = new ArrayList<List<Double>>();
+					List<Double> line = new ArrayList<Double>();
+					for (int j = 0; j < newCentroids[i].length; j++) {
+						line.add(newCentroids[i][j]);
+					}
+					lines.add(line);
+					GraphPanel.drawLines(lines);
+				}
 				break;
+			}
 			//copy newCentroids into centroids
 			for (int i = 0; i < centroids.length; i++) {
 				for (int j = 0; j < this.dimension; j++) {
