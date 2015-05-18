@@ -1,5 +1,6 @@
 package clustering;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,15 +49,21 @@ public class KMeansClustering {
 			newCentroids = adjustCentroidForAllClusters();
 			Utils.printDoubleMatrix("new centroids: ", newCentroids);
 			if(!centroidsMoved(newCentroids, centroids)){
+				List<List<Double>> lines = new ArrayList<List<Double>>();
+				List<Double> line;
 				for (int i = 0; i < newCentroids.length; i++) {
-					List<List<Double>> lines = new ArrayList<List<Double>>();
-					List<Double> line = new ArrayList<Double>();
+					line = new ArrayList<Double>();
 					for (int j = 0; j < newCentroids[i].length; j++) {
 						line.add(newCentroids[i][j]);
 					}
 					lines.add(line);
-					GraphPanel.drawLines(lines);
 				}
+				
+		        List<Color> lineColors = new ArrayList<Color>();
+		        lineColors.add(new Color(230, 0, 0, 180));
+		        lineColors.add(new Color(0, 230, 0, 180));
+		        lineColors.add(new Color(0, 0, 230, 180));
+				GraphPanel.drawLines(lines, lineColors);
 				break;
 			}
 			//copy newCentroids into centroids

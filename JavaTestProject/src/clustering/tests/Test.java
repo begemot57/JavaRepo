@@ -72,7 +72,7 @@ public class Test {
 			metrics[i] = new Metric(metric);
 			lines.add(line);
 		}
-		GraphPanel.drawLines(lines);
+		GraphPanel.drawLines(lines, null);
 		return metrics;
 	}
 	
@@ -114,7 +114,7 @@ public class Test {
 			metrics[i] = new Metric(metric);
 			lines.add(line);
 		}
-		GraphPanel.drawLines(lines);
+		GraphPanel.drawLines(lines, null);
 		return metrics;
 	}
 }

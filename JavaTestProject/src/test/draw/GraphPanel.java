@@ -22,7 +22,7 @@ public class GraphPanel extends JPanel {
     private int heigth = 400;
     private int padding = 25;
     private int labelPadding = 25;
-    private Color lineColor = new Color(44, 102, 230, 180);
+    private List<Color> lineColors = new ArrayList<Color>();
     private Color pointColor = new Color(100, 100, 100, 180);
     private Color gridColor = new Color(200, 200, 200, 200);
     private static final Stroke GRAPH_STROKE = new BasicStroke(2f);
@@ -30,8 +30,13 @@ public class GraphPanel extends JPanel {
     private int numberYDivisions = 10;
     private List<List<Double>> scores;
 
-    public GraphPanel(List<List<Double>> scores) {
+    public GraphPanel(List<List<Double>> scores, List<Color> lineColors) {
         this.scores = scores;
+        if(lineColors != null)
+        	this.lineColors = lineColors;
+        else{
+        	this.lineColors.add(new Color(44, 102, 230, 180));
+        }
     }
 
     @Override
@@ -103,9 +108,12 @@ public class GraphPanel extends JPanel {
         g2.drawLine(padding + labelPadding, getHeight() - padding - labelPadding, getWidth() - padding, getHeight() - padding - labelPadding);
 
         Stroke oldStroke = g2.getStroke();
-        g2.setColor(lineColor);
+        if(this.lineColors.size() == 1)
+        	g2.setColor(this.lineColors.get(0));
         g2.setStroke(GRAPH_STROKE);
         for (int i = 0; i < graphPoints.size(); i++) {
+        	if(this.lineColors.size() > 1)
+        		g2.setColor(this.lineColors.get(i));
         	lineGraphPoints = graphPoints.get(i);
 	        for (int j = 0; j < lineGraphPoints.size() - 1; j++) {
 	            int x1 = lineGraphPoints.get(j).x;
@@ -179,7 +187,13 @@ public class GraphPanel extends JPanel {
 	        }
 	        scores.add(line);
         }
-        GraphPanel mainPanel = new GraphPanel(scores);
+        
+        List<Color> lineColors = new ArrayList<Color>();
+        lineColors.add(new Color(230, 0, 0, 180));
+        lineColors.add(new Color(0, 230, 0, 180));
+        lineColors.add(new Color(0, 0, 230, 180));
+        
+        GraphPanel mainPanel = new GraphPanel(scores, lineColors);
         mainPanel.setPreferredSize(new Dimension(800, 600));
         JFrame frame = new JFrame("DrawGraph");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -189,10 +203,10 @@ public class GraphPanel extends JPanel {
         frame.setVisible(true);
     }
     
-    public static void drawLines(final List<List<Double>> lines){
+    public static void drawLines(final List<List<Double>> lines, final List<Color> lineColors){
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                GraphPanel mainPanel = new GraphPanel(lines);
+                GraphPanel mainPanel = new GraphPanel(lines, lineColors);
                 mainPanel.setPreferredSize(new Dimension(800, 600));
                 JFrame frame = new JFrame("DrawGraph");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
