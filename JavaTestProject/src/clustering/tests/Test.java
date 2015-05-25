@@ -1,12 +1,12 @@
 package clustering.tests;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import test.draw.GraphPanel;
-
 import clustering.KMeansClustering;
 import clustering.DistanceMeasure;
 import clustering.EuclideanDistance;
@@ -23,7 +23,7 @@ public class Test {
 
 	void run(){
 		int numberOfClusters = 3;
-		double threshold = 10;
+		double threshold = 2;
 		int numberOfIterations = 1000;
 		DistanceMeasure distMeasure = new EuclideanDistance();
 		Metric[] metrics = randomMetricGeneratorDiffPattern(100, 100);
@@ -81,10 +81,12 @@ public class Test {
 		Metric[] metrics = new Metric[numberOfItems]; 
 		List<List<Double>> lines = new ArrayList<List<Double>>();
 		List<Double> line;
+		List<Color> lineColors = new ArrayList<Color>();
 		for (int i = 0; i < numberOfItems; i++) {
 			 line = new ArrayList<Double>();
 			double[] metric = new double[dimension];
 			if(i < numberOfItems/3){
+				lineColors.add(new Color(230, 0, 0, 180));
 				for (int j = 0; j < dimension; j++) {
 					if(j > 10 && j< 20)
 						metric[j] = 90 + (100 - 90) * r.nextDouble();
@@ -93,6 +95,7 @@ public class Test {
 					line.add(metric[j]);
 				}
 			} else if(i < numberOfItems/1.5){
+				lineColors.add(new Color(0, 230, 0, 180));
 				for (int j = 0; j < dimension; j++) {
 					if(j > 30 && j< 40)
 						metric[j] = 30 + (40 - 30) * r.nextDouble();
@@ -103,6 +106,7 @@ public class Test {
 					line.add(metric[j]);
 				}
 			} else{
+				lineColors.add(new Color(0, 0, 230, 180));
 				for (int j = 0; j < dimension; j++) {
 					if(j > 80 && j< 90)
 						metric[j] = 0 + (10 - 0) * r.nextDouble();
@@ -114,7 +118,7 @@ public class Test {
 			metrics[i] = new Metric(metric);
 			lines.add(line);
 		}
-		GraphPanel.drawLines(lines, null);
+		GraphPanel.drawLines(lines, lineColors);
 		return metrics;
 	}
 }
