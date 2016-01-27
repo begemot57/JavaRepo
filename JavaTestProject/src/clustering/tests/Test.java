@@ -38,7 +38,7 @@ public class Test {
 		for (int i = 0; i < numberOfItems; i++) {
 			double[] metric = new double[dimension];
 			for (int j = 0; j < dimension; j++) {
-				metric[j] = 1000 * r.nextDouble();
+				metric[j] = 100 * r.nextDouble();
 			}
 			metrics[i] = new Metric(metric);
 		}
