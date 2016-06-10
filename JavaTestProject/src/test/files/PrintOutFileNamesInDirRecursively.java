@@ -16,7 +16,7 @@ import java.util.List;
 public class PrintOutFileNamesInDirRecursively {
 
 	private static String FILE_NAME = ".java";
-	private static String DIR_PATH = "C:/rtc_ws/Tivoli_Analytics_Stream_uServices/src/AnalyticsServices/test/java";
+	private static String DIR_PATH = "C:/rtc_ws/Tivoli_Analytics_Stream_uServices/src/StreamingAnalyticsLite/test/java";
 	private static int overall_counter = 0;
 	private static List<String> FILES = new ArrayList<>();
 	private static boolean CHECK_DUPLICATES = true;
