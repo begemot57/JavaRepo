@@ -3,6 +3,11 @@ package test.misc;
 public class SyncronizedTest {
 
 	/**
+	 * This is to show that "syncronized" doesn't lock the object.
+	 * It syncronizes code execution of syncronized code.
+	 * So if you modify something in a syncronized block you might still 
+	 * get a concurrent modification exception because it's modified
+	 * somewhere else at the same time. 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -42,7 +47,7 @@ public class SyncronizedTest {
 		LockingThread(TestObject testObject, long sleepingTime) {
 			this.testObject = testObject;
 			this.sleepingTime = sleepingTime;
-			System.out.println("Creating LockingThread");
+			System.out.println("Created LockingThread");
 		}
 
 		public void run() {
@@ -66,7 +71,7 @@ public class SyncronizedTest {
 
 		ModifyingThread(TestObject testObject) {
 			this.testObject = testObject;
-			System.out.println("Creating ModifyingThread");
+			System.out.println("Created ModifyingThread");
 		}
 
 		public void run() {
