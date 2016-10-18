@@ -17,7 +17,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import beans.AddsMonitor;
+import beans.AdsMonitor;
 import beans.MonitoringJsonObject;
 
 /**
@@ -91,7 +91,7 @@ public class AddsMonitorController {
 			curr_monitors.add(new MonitoringJsonObject(name, URL, email, frequency, STATUS_RUNNING));
 			writeMonitorsIntoFile(curr_monitors);
 
-			AddsMonitor monitor = new AddsMonitor(name, URL, email, frequency, log);
+			AdsMonitor monitor = new AdsMonitor(name, URL, email, frequency, log);
 			Thread moinitor_thread = new Thread(monitor);
 			moinitor_thread.setName(monitor_name);
 			moinitor_thread.start();
@@ -223,7 +223,7 @@ public class AddsMonitorController {
 					carMonitoringJsonObject.setStatus(STATUS_RUNNING);
 					continue;
 				}
-				AddsMonitor monitor = new AddsMonitor(name, URL, email, frequency, log);
+				AdsMonitor monitor = new AdsMonitor(name, URL, email, frequency, log);
 				Thread moinitor_thread = new Thread(monitor);
 				moinitor_thread.setName(monitor_name);
 				moinitor_thread.start();

@@ -1,5 +1,6 @@
 package beans;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.net.SocketTimeoutException;
@@ -22,17 +23,20 @@ import utils.SendMailTLS;
  * @author Leo
  *
  */
-public class AddsMonitor implements Runnable {
+public class AdsMonitor implements Runnable {
 	private Document doc;
+	private String controllerPage = "http://begemot57.ddns.net:8080/Ddmonitorusers/";
 	private String URL;
 	private String frequency;
 	private PrintWriter log;
 	private boolean sendEmail = true;
+	private boolean debugMode = false;
+	private boolean loadFromFile = false;
 	private String email;
 	private String name;
 	private String NO_ADD = "no_add";
 	private Calendar cal;
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HHmmss");
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HH:mm:ss");
 
 	public static void main(String[] args) {
 		String URL = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&price_to=3000&year_from=2003&year_to=2006&price_from=1000&transmission=Automatic";
@@ -40,13 +44,13 @@ public class AddsMonitor implements Runnable {
 		// String URL = "https://www.donedeal.ie/cars/Toyota";
 		String frequency = "30";
 		String email = "ioffe.leo@gmail.com";
-		AddsMonitor test = new AddsMonitor("monitor1", URL, email, frequency, new PrintWriter(System.out));
+		AdsMonitor test = new AdsMonitor("monitor1", URL, email, frequency, new PrintWriter(System.out));
 		if (args.length > 0)
 			test.setURL(args[0]);
 		test.run();
 	}
 
-	public AddsMonitor(String name, String URL, String email, String frequency, PrintWriter log) {
+	public AdsMonitor(String name, String URL, String email, String frequency, PrintWriter log) {
 		this.name = name;
 		this.URL = URL;
 		this.email = email;
@@ -57,32 +61,40 @@ public class AddsMonitor implements Runnable {
 	public void run() {
 		log("Starting: " + toString());
 		String first_add = null;
-		List<String> newAdds;
+		List<String> newAds;
 		int counter = 0;
 		try {
 			cal = Calendar.getInstance();
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
-			log(processId);
+			log("processId: " + processId);
 			while (true) {
 				counter++;
 
-				// try to reach the page for three times
+				// try to reach the page five times
 				int count = 0;
-				int maxTries = 3;
+				int maxTries = 5;
+				if(debugMode)
+					log("Monitoring URL: "+ URL);
 				while (true) {
 					try {
-						doc = Jsoup.connect(URL).timeout(60000).get();
+						if(loadFromFile){
+							File input = new File(URL);
+							doc = Jsoup.parse(input, "UTF-8", "http://example.com/");
+						}
+						else	
+							doc = Jsoup.connect(URL).timeout(60000).get();
 						break;
 					} catch (SocketTimeoutException e) {
 						// handle exception
 						if (++count == maxTries) {
-							log("SocketTimeoutException thrown three times");
+							log("SocketTimeoutException thrown "+maxTries+" times");
 							throw e;
 						}
 					}
 				}
 
 				if (first_add == null) {
+					log("Inspect page firt time...");
 					String currAdd;
 					for (int i = 0; i < 31; i++) {
 						currAdd = getAElementFromList("cardResults", i);
@@ -92,14 +104,13 @@ public class AddsMonitor implements Runnable {
 							break;
 						}
 					}
-					log("Start monitoring");
 					cal = Calendar.getInstance();
-					log(sdf.format(cal.getTime()));
+					log("Start monitoring: "+sdf.format(cal.getTime()));
 					sendMail("Start monitoring Donedeal.ie adds",
 							"Started monitoring this search: \n" + URL + "\nMonitoring interval: " + frequency);
 				}
 
-				newAdds = new ArrayList<String>(10);
+				newAds = new ArrayList<String>(10);
 				String currAdd;
 				for (int i = 0; i < 31; i++) {
 					currAdd = getAElementFromList("cardResults", i);
@@ -108,24 +119,29 @@ public class AddsMonitor implements Runnable {
 					if (currAdd.isEmpty())
 						break;
 					if (!currAdd.equals(first_add)) {
-						newAdds.add(currAdd);
+						newAds.add(currAdd);
 					} else {
 						break;
 					}
 				}
-				if (!newAdds.isEmpty()) {
-					first_add = newAdds.get(0);
-					sendMail("New Donedeal.ie adds", Arrays.toString(newAdds.toArray()));
+				if (!newAds.isEmpty()) {
+					first_add = newAds.get(0);
+					if(debugMode)
+						log("Found new ads: "+Arrays.toString(newAds.toArray()));
+					sendMail("New Donedeal.ie adds", Arrays.toString(newAds.toArray()));
 				}
+				//this is to see roughly when process has died
 				if (counter == 100) {
 					cal = Calendar.getInstance();
-					log(sdf.format(cal.getTime()));
+					log("Still alive at: "+sdf.format(cal.getTime()));
 					counter = 0;
 				}
 
 				try {
-					// log("go to sleep");
-					Thread.sleep(Integer.parseInt(frequency) * 1000);
+					long sleepTime = Integer.parseInt(frequency) * 1000;
+					if(debugMode)
+						log("Sleep for "+sleepTime+ " mills...");
+					Thread.sleep(sleepTime);
 				} catch (InterruptedException x) {
 					log("in run() - interrupted while sleeping");
 					Thread.currentThread().interrupt();
@@ -146,16 +162,13 @@ public class AddsMonitor implements Runnable {
 	}
 
 	private void sendMail(String subject, String body) throws Exception {
-		String fullBody = body.concat("\nController page: http://begemot57.ddns.net:8080/Ddmonitorusers/");
+		if (!sendEmail)
+			return;
+		String fullBody = body.concat("\nController page: "+controllerPage);
 		log("send email");
 		log("email: " + email);
 		log("subject: " + subject);
 		log(fullBody);
-		if (!sendEmail)
-			return;
-		// out.write("send email");
-		// out.write(Arrays.toString(newAdds.toArray()));
-		// out.flush();
 		SendMailTLS.send(email, subject, fullBody);
 	}
 
@@ -166,12 +179,18 @@ public class AddsMonitor implements Runnable {
 			return "";
 		Element a = child.select("a").first();
 		// ignore third party adds
-		if (a == null)
+		if (a == null){
+			if(debugMode)
+				log("Found a==null");
 			return NO_ADD;
+		}
 		// ignore spotlight
 		Elements spans = a.select(".spotlight-tab");
-		if (!spans.isEmpty())
+		if (!spans.isEmpty()){
+			if(debugMode)
+				log("Found spotlight ad");
 			return NO_ADD;
+		}
 		return a.attr("href");
 	}
 
@@ -204,10 +223,30 @@ public class AddsMonitor implements Runnable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	public void setSendEmail(boolean sendEmail) {
+		this.sendEmail = sendEmail;
+	}
+
+	public void setDebugMode(boolean debugMode) {
+		this.debugMode = debugMode;
+	}
+
+	public String getControllerPage() {
+		return controllerPage;
+	}
+
+	public void setControllerPage(String controllerPage) {
+		this.controllerPage = controllerPage;
+	}
+
+	public void setLoadFromFile(boolean loadFromFile) {
+		this.loadFromFile = loadFromFile;
+	}
 
 	@Override
 	public String toString() {
-		return "CarAddsMonitor [name= " + name + ", URL=" + URL + ", email=" + email + ", frequency=" + frequency + "]";
+		return "AdsMonitor [name= " + name + ", URL=" + URL + ", email=" + email + ", frequency=" + frequency + "]";
 	}
 
 }
