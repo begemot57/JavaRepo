@@ -31,9 +31,9 @@ import beans.MonitoringJsonObject;
  * @author Leo
  *
  */
-public class AddsMonitorController {
+public class AdsMonitorController {
 
-	private static AddsMonitorController controller = new AddsMonitorController();
+	private static AdsMonitorController controller = new AdsMonitorController();
 	private List<Thread> monitors;
 	private PrintWriter log;
 	private File tasks_file;
@@ -45,7 +45,7 @@ public class AddsMonitorController {
 
 	// private constructor. This class cannot be instantiated from outside and
 	// prevents sub classing.
-	private AddsMonitorController() {
+	private AdsMonitorController() {
 		cal = Calendar.getInstance();
 		String log_file_name = "ddmonitor_users_" + sdf.format(cal.getTime()).concat(".log");
 		try {
@@ -64,7 +64,7 @@ public class AddsMonitorController {
 		resumeExistingTasks();
 	}
 
-	public static AddsMonitorController getInstance() {
+	public static AdsMonitorController getInstance() {
 		return controller;
 	}
 
@@ -369,7 +369,7 @@ public class AddsMonitorController {
 	}
 
 	public static void main(String[] args) {
-		AddsMonitorController controller = AddsMonitorController.getInstance();
+		AdsMonitorController controller = AdsMonitorController.getInstance();
 		String URL1 = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&sort=publishDate%20desc&price_to=3000&year_from=2002&year_to=2005&price_from=1000&transmission=Automatic";
 		String frequency = "30";
 		String email = "ioffe.leo@gmail.com";

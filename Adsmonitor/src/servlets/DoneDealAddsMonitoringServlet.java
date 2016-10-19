@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 
 import beans.MonitoringJsonObject;
-import controllers.AddsMonitorController;
+import controllers.AdsMonitorController;
 
 /**
  * Servlet implementation class Servlet
@@ -42,7 +42,7 @@ public class DoneDealAddsMonitoringServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String userEmail = request.getParameter("user_email");
 		boolean showAll = (userEmail.equals(SUPER_USER_EMAIL));
-		List<MonitoringJsonObject> monitors = AddsMonitorController.getInstance().getCurrentMonitorsFromFile();
+		List<MonitoringJsonObject> monitors = AdsMonitorController.getInstance().getCurrentMonitorsFromFile();
 		if (!showAll)
 			monitors = filterMonitors(monitors, userEmail);
 		Collections.sort(monitors);
@@ -63,7 +63,7 @@ public class DoneDealAddsMonitoringServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String userEmail = request.getParameter("user_email");
 		boolean showAll = (userEmail.equals(SUPER_USER_EMAIL));
-		AddsMonitorController controller = AddsMonitorController.getInstance();
+		AdsMonitorController controller = AdsMonitorController.getInstance();
 		String value = request.getParameter("value");
 		String name = request.getParameter("name");
 		String url = request.getParameter("url");

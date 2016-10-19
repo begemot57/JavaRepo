@@ -37,6 +37,7 @@ public class AdsMonitor implements Runnable {
 	private String NO_ADD = "no_add";
 	private Calendar cal;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HH:mm:ss");
+	private List<String> newAds = new ArrayList<String>(10); 
 
 	public static void main(String[] args) {
 		String URL = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&price_to=3000&year_from=2003&year_to=2006&price_from=1000&transmission=Automatic";
@@ -61,7 +62,6 @@ public class AdsMonitor implements Runnable {
 	public void run() {
 		log("Starting: " + toString());
 		String first_add = null;
-		List<String> newAds;
 		int counter = 0;
 		try {
 			cal = Calendar.getInstance();
@@ -110,7 +110,6 @@ public class AdsMonitor implements Runnable {
 							"Started monitoring this search: \n" + URL + "\nMonitoring interval: " + frequency);
 				}
 
-				newAds = new ArrayList<String>(10);
 				String currAdd;
 				for (int i = 0; i < 31; i++) {
 					currAdd = getAElementFromList("cardResults", i);
@@ -242,6 +241,10 @@ public class AdsMonitor implements Runnable {
 
 	public void setLoadFromFile(boolean loadFromFile) {
 		this.loadFromFile = loadFromFile;
+	}
+	
+	public List<String> getNewAds() {
+		return newAds;
 	}
 
 	@Override
