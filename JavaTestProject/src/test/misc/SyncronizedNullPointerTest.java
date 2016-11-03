@@ -22,8 +22,8 @@ public class SyncronizedNullPointerTest {
 
 		// Thread.sleep(1000);
 
-		Thread modifying = new Thread(new ModifyingThread());
-		modifying.start();
+//		Thread modifying = new Thread(new ModifyingThread());
+//		modifying.start();
 	}
 
 	class LockingThread implements Runnable {
