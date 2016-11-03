@@ -39,6 +39,7 @@ public class SyncronizedNullPointerTest {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			@SuppressWarnings("unused")
 			TestObject o = new TestObject();
 		}
 
@@ -52,6 +53,7 @@ public class SyncronizedNullPointerTest {
 
 		public void run() {
 			System.out.println("Running ModifyingThread");
+			@SuppressWarnings("unused")
 			TestObject o = new TestObject();
 		}
 
