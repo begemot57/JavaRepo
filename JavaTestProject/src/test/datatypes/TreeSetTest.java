@@ -14,6 +14,7 @@ public class TreeSetTest {
 		tSet.add("Anna");
 		tSet.add("Will");
 		tSet.add("Jerome");
+		tSet.add("ant");
 		
 		for (String string : tSet) {
 			System.out.println(string);
