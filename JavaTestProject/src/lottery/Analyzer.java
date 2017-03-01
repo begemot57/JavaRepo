@@ -3,17 +3,22 @@ package lottery;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
 public class Analyzer {
-
+	
 	void run() {
-		try (BufferedReader br = new BufferedReader(new FileReader(
-				"./files/EuroMillionsGameData.csv"))) {
-
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(
+					"./files/EuroMillionsGameData.csv"));
+			
+			Calendar c = Calendar.getInstance();
 			String[] strNumbers;
 			int counter = 0;
 			Integer[] occurrences = new Integer[50];
@@ -29,8 +34,13 @@ public class Analyzer {
 			String sCurrentLine = br.readLine();
 
 			while ((sCurrentLine = br.readLine()) != null) {
-				counter++;
 				strNumbers = sCurrentLine.split(";");
+				
+				c.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(strNumbers[0]));
+				int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+				if(dayOfWeek != 3)
+					continue;
+				counter++;
 				for (int i = 1; i < 6; i++) {
 					int number = Integer.parseInt(strNumbers[i]);
 					occurrences[number - 1]++;
@@ -40,6 +50,7 @@ public class Analyzer {
 					occurrencesStars[number - 1]++;
 				}
 			}
+			br.close();
 
 			System.out.println("counter: " + counter);
 
@@ -85,7 +96,7 @@ public class Analyzer {
 				System.out.println(pair.number + " : " + pair.occurrence);
 			}
 
-		} catch (IOException e) {
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
 	}
