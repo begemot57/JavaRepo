@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class Analyzer {
 
@@ -23,7 +20,7 @@ public class Analyzer {
 			for (int i = 0; i < occurrences.length; i++) {
 				occurrences[i] = 0;
 			}
-			
+
 			Integer[] occurrencesStars = new Integer[12];
 			for (int i = 0; i < occurrencesStars.length; i++) {
 				occurrencesStars[i] = 0;
@@ -46,46 +43,46 @@ public class Analyzer {
 
 			System.out.println("counter: " + counter);
 
-			//sort numbers
+			// sort numbers
 			List<Pair> sortedOccurrences = new ArrayList<>();
 			int count = 0;
-			while(true) {
+			while (true) {
 				int max = Collections.max(Arrays.asList(occurrences));
 				for (int i = 0; i < occurrences.length; i++) {
-					if(occurrences[i] == max){
-						sortedOccurrences.add(new Pair(i+1, max));
+					if (occurrences[i] == max) {
+						sortedOccurrences.add(new Pair(i + 1, max));
 						occurrences[i] = -1;
 						count++;
 					}
 				}
-				if(count == occurrences.length)
+				if (count == occurrences.length)
 					break;
 			}
 
-			//sort stars
+			// sort stars
 			List<Pair> sortedOccurrencesStars = new ArrayList<>();
 			count = 0;
-			while(true) {
+			while (true) {
 				int max = Collections.max(Arrays.asList(occurrencesStars));
 				for (int i = 0; i < occurrencesStars.length; i++) {
-					if(occurrencesStars[i] == max){
-						sortedOccurrencesStars.add(new Pair(i+1, max));
+					if (occurrencesStars[i] == max) {
+						sortedOccurrencesStars.add(new Pair(i + 1, max));
 						occurrencesStars[i] = -1;
 						count++;
 					}
 				}
-				if(count == occurrencesStars.length)
+				if (count == occurrencesStars.length)
 					break;
 			}
 
 			System.out.println("NUMBERS");
 			for (Pair pair : sortedOccurrences) {
-				System.out.println(pair.number +" : "+pair.occurrence);
+				System.out.println(pair.number + " : " + pair.occurrence);
 			}
-			
+
 			System.out.println("STARS");
 			for (Pair pair : sortedOccurrencesStars) {
-				System.out.println(pair.number +" : "+pair.occurrence);
+				System.out.println(pair.number + " : " + pair.occurrence);
 			}
 
 		} catch (IOException e) {
@@ -109,7 +106,7 @@ public class Analyzer {
 			this.number = number;
 			this.occurrence = occurrence;
 		}
-		
+
 	}
-	
+
 }
