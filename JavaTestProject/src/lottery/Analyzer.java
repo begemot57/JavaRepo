@@ -13,6 +13,8 @@ import java.util.List;
 
 public class Analyzer {
 	
+	boolean CHECK_TUE_FRI = false;
+	
 	void run() {
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(
@@ -22,13 +24,17 @@ public class Analyzer {
 			String[] strNumbers;
 			int counter = 0;
 			Integer[] occurrences = new Integer[50];
+			Integer[] lastOccurred = new Integer[50];
 			for (int i = 0; i < occurrences.length; i++) {
 				occurrences[i] = 0;
+				lastOccurred[i] = 0;
 			}
 
 			Integer[] occurrencesStars = new Integer[12];
+			Integer[] lastOccurredStars = new Integer[12];
 			for (int i = 0; i < occurrencesStars.length; i++) {
 				occurrencesStars[i] = 0;
+				lastOccurredStars[i] = 0;
 			}
 			// drop first line
 			String sCurrentLine = br.readLine();
@@ -36,18 +42,25 @@ public class Analyzer {
 			while ((sCurrentLine = br.readLine()) != null) {
 				strNumbers = sCurrentLine.split(";");
 				
-				c.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(strNumbers[0]));
-				int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-				if(dayOfWeek != 3)
-					continue;
+				if(CHECK_TUE_FRI){
+					c.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(strNumbers[0]));
+					int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+					if(dayOfWeek != 3)
+						continue;
+				}
+				
 				counter++;
 				for (int i = 1; i < 6; i++) {
 					int number = Integer.parseInt(strNumbers[i]);
 					occurrences[number - 1]++;
+					if(lastOccurred[number - 1]==0)
+						lastOccurred[number - 1] = counter;
 				}
 				for (int i = 6; i < 8; i++) {
 					int number = Integer.parseInt(strNumbers[i]);
 					occurrencesStars[number - 1]++;
+					if(lastOccurredStars[number - 1]==0)
+						lastOccurredStars[number - 1] = counter;
 				}
 			}
 			br.close();
@@ -88,12 +101,12 @@ public class Analyzer {
 
 			System.out.println("NUMBERS");
 			for (Pair pair : sortedOccurrences) {
-				System.out.println(pair.number + " : " + pair.occurrence);
+				System.out.println(pair.number + " : " + pair.occurrence + " - "+lastOccurred[pair.number-1]);
 			}
 
 			System.out.println("STARS");
 			for (Pair pair : sortedOccurrencesStars) {
-				System.out.println(pair.number + " : " + pair.occurrence);
+				System.out.println(pair.number + " : " + pair.occurrence + " - "+lastOccurredStars[pair.number-1]);
 			}
 
 		} catch (IOException | ParseException e) {
