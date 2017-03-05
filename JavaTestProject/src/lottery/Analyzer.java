@@ -38,6 +38,8 @@ public class Analyzer {
 			}
 			// drop first line
 			String sCurrentLine = br.readLine();
+			br.readLine();
+			br.readLine();
 
 			while ((sCurrentLine = br.readLine()) != null) {
 				strNumbers = sCurrentLine.split(";");
@@ -64,6 +66,9 @@ public class Analyzer {
 				}
 			}
 			br.close();
+			
+			Integer[] lastOccurredClone = lastOccurred.clone();
+			Integer[] lastOccurredStarsClone = lastOccurredStars.clone();
 
 			System.out.println("counter: " + counter);
 
@@ -83,6 +88,22 @@ public class Analyzer {
 					break;
 			}
 
+			// sort last occurred numbers
+			List<Pair> sortedLastOccurred = new ArrayList<>();
+			count = 0;
+			while (true) {
+				int max = Collections.max(Arrays.asList(lastOccurred));
+				for (int i = 0; i < lastOccurred.length; i++) {
+					if (lastOccurred[i] == max) {
+						sortedLastOccurred.add(new Pair(i + 1, max));
+						lastOccurred[i] = -1;
+						count++;
+					}
+				}
+				if (count == lastOccurred.length)
+					break;
+			}
+			
 			// sort stars
 			List<Pair> sortedOccurrencesStars = new ArrayList<>();
 			count = 0;
@@ -98,15 +119,36 @@ public class Analyzer {
 				if (count == occurrencesStars.length)
 					break;
 			}
+			// sort last occurred stars
+			List<Pair> sortedLastOccurredStars = new ArrayList<>();
+			count = 0;
+			while (true) {
+				int max = Collections.max(Arrays.asList(lastOccurredStars));
+				for (int i = 0; i < lastOccurredStars.length; i++) {
+					if (lastOccurredStars[i] == max) {
+						sortedLastOccurredStars.add(new Pair(i + 1, max));
+						lastOccurredStars[i] = -1;
+						count++;
+					}
+				}
+				if (count == lastOccurredStars.length)
+					break;
+			}
 
 			System.out.println("NUMBERS");
-			for (Pair pair : sortedOccurrences) {
-				System.out.println(pair.number + " : " + pair.occurrence + " - "+lastOccurred[pair.number-1]);
+			for (int i = 0; i < sortedOccurrences.size(); i++) {
+				Pair occurrPair = sortedOccurrences.get(i);
+				Pair lastOccurredPair = sortedLastOccurred.get(i);
+//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredClone[occurrPair.number-1] + " - " +lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
+				System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence);
 			}
 
 			System.out.println("STARS");
-			for (Pair pair : sortedOccurrencesStars) {
-				System.out.println(pair.number + " : " + pair.occurrence + " - "+lastOccurredStars[pair.number-1]);
+			for (int i = 0; i < sortedOccurrencesStars.size(); i++) {
+				Pair occurrPair = sortedOccurrencesStars.get(i);
+				Pair lastOccurredPair = sortedLastOccurredStars.get(i);
+//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredStarsClone[occurrPair.number-1] + " - "+lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
+				System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredStarsClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence);
 			}
 
 		} catch (IOException | ParseException e) {
