@@ -19,8 +19,10 @@ public class Analyzer {
 	int NUMBERS_RANGE = 50;
 	int STARS_SIZE = 2;
 	int STARS_RANGE = 12;
+	List<Pair> sortedOccurrAndLastOccurNormalized;
+	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
 	
-	void run() {
+	void computeNormalizedProbabilities(int startRow) {
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(
 					HISTORY_DATA_FILE));
@@ -35,6 +37,9 @@ public class Analyzer {
 
 			// drop first line
 			String sCurrentLine = br.readLine();
+			for (int i = 0; i < startRow; i++) {
+				br.readLine();
+			}
 
 			while ((sCurrentLine = br.readLine()) != null) {
 				strNumbers = sCurrentLine.split(";");
@@ -82,8 +87,8 @@ public class Analyzer {
 			List<Pair> sortedOccurrencesStars = createSortedPairsList(occurrencesStars);
 			List<Pair> sortedLastOccurred = createSortedPairsList(lastOccurred);
 			List<Pair> sortedLastOccurredStars = createSortedPairsList(lastOccurredStars);
-			List<Pair> sortedOccurrAndLastOccurNormalized = createSortedPairsList(occurrAndLastOccurNormalized);
-			List<Pair> sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
+			sortedOccurrAndLastOccurNormalized = createSortedPairsList(occurrAndLastOccurNormalized);
+			sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
 
 			System.out.println("NUMBERS");
 			for (int i = 0; i < sortedOccurrences.size(); i++) {
@@ -176,7 +181,7 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) {
 		Analyzer a = new Analyzer();
-		a.run();
+		a.computeNormalizedProbabilities(0);
 	}
 
 	public class Pair {
@@ -189,6 +194,14 @@ public class Analyzer {
 			this.occurrence = occurrence;
 		}
 
+	}
+
+	public List<Pair> getSortedOccurrAndLastOccurNormalized() {
+		return sortedOccurrAndLastOccurNormalized;
+	}
+
+	public List<Pair> getSortedOccurrAndLastOccurStarsNormalized() {
+		return sortedOccurrAndLastOccurStarsNormalized;
 	}
 
 }
