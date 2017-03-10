@@ -2,6 +2,8 @@ package beans;
 
 import java.io.PrintWriter;
 
+import utils.Logger;
+
 import junit.framework.TestCase;
 
 public class AdsMonitorTest extends TestCase {
@@ -13,8 +15,9 @@ public class AdsMonitorTest extends TestCase {
 	protected AdsMonitor monitor;
 
 	protected void setUp() {
-		monitor = new AdsMonitor("monitor1", URL, email, frequency,
-				new PrintWriter(System.out));
+		Logger logger = Logger.getInstance(new PrintWriter(System.out));
+		logger.log("bla");
+		monitor = new AdsMonitor("monitor1", URL, email, frequency);
 		monitor.setSendEmail(false);
 		monitor.setDebugMode(true);
 		monitor.setLoadFromFile(true);

@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import utils.Logger;
 import utils.SendMailTLS;
 
 /**
@@ -28,7 +29,7 @@ public class AdsMonitor implements Runnable {
 	private String controllerPage = "http://begemot57.ddns.net:8080/Ddmonitorusers/";
 	private String URL;
 	private String frequency;
-	private PrintWriter log;
+	private Logger logger;
 	private boolean sendEmail = true;
 	private boolean debugMode = false;
 	private boolean loadFromFile = false;
@@ -45,28 +46,28 @@ public class AdsMonitor implements Runnable {
 		// String URL = "https://www.donedeal.ie/cars/Toyota";
 		String frequency = "30";
 		String email = "ioffe.leo@gmail.com";
-		AdsMonitor test = new AdsMonitor("monitor1", URL, email, frequency, new PrintWriter(System.out));
+		AdsMonitor test = new AdsMonitor("monitor1", URL, email, frequency);
 		if (args.length > 0)
 			test.setURL(args[0]);
 		test.run();
 	}
 
-	public AdsMonitor(String name, String URL, String email, String frequency, PrintWriter log) {
+	public AdsMonitor(String name, String URL, String email, String frequency) {
 		this.name = name;
 		this.URL = URL;
 		this.email = email;
 		this.frequency = frequency;
-		this.log = log;
+		logger = Logger.getInstance();
 	}
 
 	public void run() {
-		log("Starting: " + toString());
+		logger.log("Starting: " + toString());
 		String first_add = null;
 		int counter = 0;
 		try {
 			cal = Calendar.getInstance();
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
-			log("processId: " + processId);
+			logger.log("processId: " + processId);
 			while (true) {
 				counter++;
 
@@ -74,7 +75,7 @@ public class AdsMonitor implements Runnable {
 				int count = 0;
 				int maxTries = 5;
 				if(debugMode)
-					log("Monitoring URL: "+ URL);
+					logger.log("Monitoring URL: "+ URL);
 				while (true) {
 					try {
 						if(loadFromFile){
@@ -87,14 +88,14 @@ public class AdsMonitor implements Runnable {
 					} catch (SocketTimeoutException e) {
 						// handle exception
 						if (++count == maxTries) {
-							log("SocketTimeoutException thrown "+maxTries+" times");
+							logger.log("SocketTimeoutException thrown "+maxTries+" times");
 							throw e;
 						}
 					}
 				}
 
 				if (first_add == null) {
-					log("Inspect page firt time...");
+					logger.log("Inspect page firt time...");
 					String currAdd;
 					for (int i = 0; i < 31; i++) {
 						currAdd = getAElementFromList("cardResults", i);
@@ -105,7 +106,7 @@ public class AdsMonitor implements Runnable {
 						}
 					}
 					cal = Calendar.getInstance();
-					log("Start monitoring: "+sdf.format(cal.getTime()));
+					logger.log("Start monitoring: "+sdf.format(cal.getTime()));
 					sendMail("Start monitoring Donedeal.ie adds",
 							"Started monitoring this search: \n" + URL + "\nMonitoring interval: " + frequency);
 				}
@@ -126,23 +127,23 @@ public class AdsMonitor implements Runnable {
 				if (!newAds.isEmpty()) {
 					first_add = newAds.get(0);
 					if(debugMode)
-						log("Found new ads: "+Arrays.toString(newAds.toArray()));
+						logger.log("Found new ads: "+Arrays.toString(newAds.toArray()));
 					sendMail("New Donedeal.ie adds", Arrays.toString(newAds.toArray()));
 				}
 				//this is to see roughly when process has died
 				if (counter == 100) {
 					cal = Calendar.getInstance();
-					log("Still alive at: "+sdf.format(cal.getTime()));
+					logger.log("Still alive at: "+sdf.format(cal.getTime()));
 					counter = 0;
 				}
 
 				try {
 					long sleepTime = Integer.parseInt(frequency) * 1000;
 					if(debugMode)
-						log("Sleep for "+sleepTime+ " mills...");
+						logger.log("Sleep for "+sleepTime+ " mills...");
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException x) {
-					log("in run() - interrupted while sleeping");
+					logger.log("in run() - interrupted while sleeping");
 					Thread.currentThread().interrupt();
 					return;
 				}
@@ -153,10 +154,10 @@ public class AdsMonitor implements Runnable {
 				sendMail("Error occured monitoring Donedeal.ie adds", "Error monitoring this search: \n" + URL
 						+ "\nMonitoring interval: " + frequency + "\nError: " + e.getMessage());
 			} catch (Exception e1) {
-				e1.printStackTrace(log);
+				e1.printStackTrace(logger.getLog());
 			}
-			e.printStackTrace(log);
-			log("killing thread: " + name);
+			e.printStackTrace(logger.getLog());
+			logger.log("killing thread: " + name);
 		}
 	}
 
@@ -164,10 +165,10 @@ public class AdsMonitor implements Runnable {
 		if (!sendEmail)
 			return;
 		String fullBody = body.concat("\nController page: "+controllerPage);
-		log("send email");
-		log("email: " + email);
-		log("subject: " + subject);
-		log(fullBody);
+		logger.log("send email");
+		logger.log("email: " + email);
+		logger.log("subject: " + subject);
+		logger.log(fullBody);
 		SendMailTLS.send(email, subject, fullBody);
 	}
 
@@ -180,23 +181,17 @@ public class AdsMonitor implements Runnable {
 		// ignore third party adds
 		if (a == null){
 			if(debugMode)
-				log("Found a==null");
+				logger.log("Found a==null");
 			return NO_ADD;
 		}
 		// ignore spotlight
 		Elements spans = a.select(".spotlight-tab");
 		if (!spans.isEmpty()){
 			if(debugMode)
-				log("Found spotlight ad");
+				logger.log("Found spotlight ad");
 			return NO_ADD;
 		}
 		return a.attr("href");
-	}
-
-	private void log(String str) {
-		cal = Calendar.getInstance();
-		log.println(sdf.format(cal.getTime()) + " " + str);
-		log.flush();
 	}
 
 	public String getURL() {

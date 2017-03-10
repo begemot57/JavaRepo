@@ -3,22 +3,20 @@ package controllers;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
+import utils.Logger;
 import beans.AdsMonitor;
 import beans.MonitoringJsonObject;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Front end page:
@@ -29,34 +27,21 @@ import beans.MonitoringJsonObject;
  * Buttons: Check Status, Add New
  * 
  * @author Leo
- *
+ * 
  */
 public class AdsMonitorController {
 
 	private static AdsMonitorController controller = new AdsMonitorController();
 	private List<Thread> monitors;
-	private PrintWriter log;
+	private Logger logger = Logger.getInstance();
 	private File tasks_file;
 	private String STATUS_RUNNING = "running";
 	private String STATUS_STOPPED = "stopped";
 	private String STATUS_ERROR = "error";
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HHmmss");
-	private Calendar cal;
 
 	// private constructor. This class cannot be instantiated from outside and
 	// prevents sub classing.
 	private AdsMonitorController() {
-		cal = Calendar.getInstance();
-		String log_file_name = "ddmonitor_users_" + sdf.format(cal.getTime()).concat(".log");
-		try {
-			log = new PrintWriter(new File(log_file_name));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		// print into System.out
-		// log = new PrintWriter(System.out);
-
 		tasks_file = new File("monitoring_tasks_users.txt");
 		if (monitors == null)
 			monitors = new ArrayList<Thread>();
@@ -69,29 +54,34 @@ public class AdsMonitorController {
 	}
 
 	// we can't add monitors without starting
-	public void startMonitor(String name, String URL, String email, String frequency) {
+	public void startMonitor(String name, String URL, String email,
+			String frequency) {
 		try {
 			String monitor_name = name + "-" + URL + "-" + email;
 			// check if the name is already there - if so don't do anything
 			if (alreadyRunning(monitor_name)) {
-				log("This monitoring task is already running");
+				logger.log("This monitoring task is already running");
 				return;
 			}
 
 			// add an entry to the monitor_tasks.txt file
 			List<MonitoringJsonObject> curr_monitors = getCurrentMonitorsFromFile();
-			MonitoringJsonObject this_monitor = new MonitoringJsonObject(name, URL, email);
-			for (Iterator<MonitoringJsonObject> iterator = curr_monitors.iterator(); iterator.hasNext();) {
-				MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator.next();
+			MonitoringJsonObject this_monitor = new MonitoringJsonObject(name,
+					URL, email);
+			for (Iterator<MonitoringJsonObject> iterator = curr_monitors
+					.iterator(); iterator.hasNext();) {
+				MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator
+						.next();
 				if (carMonitoringJsonObject.equals(this_monitor)) {
 					iterator.remove();
 					break;
 				}
 			}
-			curr_monitors.add(new MonitoringJsonObject(name, URL, email, frequency, STATUS_RUNNING));
+			curr_monitors.add(new MonitoringJsonObject(name, URL, email,
+					frequency, STATUS_RUNNING));
 			writeMonitorsIntoFile(curr_monitors);
 
-			AdsMonitor monitor = new AdsMonitor(name, URL, email, frequency, log);
+			AdsMonitor monitor = new AdsMonitor(name, URL, email, frequency);
 			Thread moinitor_thread = new Thread(monitor);
 			moinitor_thread.setName(monitor_name);
 			moinitor_thread.start();
@@ -105,21 +95,24 @@ public class AdsMonitorController {
 			// from monitors
 			getCurrentMonitorsFromFile();
 		} catch (Exception e) {
-			log("Close file");
-			log.close();
+			logger.close();
 		}
 	}
 
-	public void stopMonitor(String name, String URL, String email, String frequency) {
+	public void stopMonitor(String name, String URL, String email,
+			String frequency) {
 		String task_name = name + "-" + URL + "-" + email;
 		// update file
 		List<MonitoringJsonObject> curr_monitors = getCurrentMonitorsFromFile();
-		MonitoringJsonObject this_monitor = new MonitoringJsonObject(name, URL, email);
-		for (Iterator<MonitoringJsonObject> iterator = curr_monitors.iterator(); iterator.hasNext();) {
-			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator.next();
+		MonitoringJsonObject this_monitor = new MonitoringJsonObject(name, URL,
+				email);
+		for (Iterator<MonitoringJsonObject> iterator = curr_monitors.iterator(); iterator
+				.hasNext();) {
+			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator
+					.next();
 			if (carMonitoringJsonObject.equals(this_monitor)) {
 				if (carMonitoringJsonObject.getStatus().equals(STATUS_STOPPED)) {
-					log("Monitor already stopped: " + task_name);
+					logger.log("Monitor already stopped: " + task_name);
 					return;
 				} else {
 					carMonitoringJsonObject.setStatus(STATUS_STOPPED);
@@ -132,19 +125,19 @@ public class AdsMonitorController {
 
 		// kill thread
 		try {
-			for (Iterator<Thread> iterator = monitors.iterator(); iterator.hasNext();) {
+			for (Iterator<Thread> iterator = monitors.iterator(); iterator
+					.hasNext();) {
 				Thread moinitor_thread = (Thread) iterator.next();
 				if (moinitor_thread.getName().equals(task_name)) {
 					// there could only be one with the same name
-					log("Stopping: " + moinitor_thread.getName());
+					logger.log("Stopping: " + moinitor_thread.getName());
 					moinitor_thread.interrupt();
 					iterator.remove();
 					break;
 				}
 			}
 		} catch (Exception e) {
-			log("Close file");
-			log.close();
+			logger.close();
 		}
 	}
 
@@ -155,9 +148,12 @@ public class AdsMonitorController {
 		boolean found = false;
 		// delete entry from file (no matter running or not)
 		List<MonitoringJsonObject> curr_monitors = getCurrentMonitorsFromFile();
-		MonitoringJsonObject this_monitor = new MonitoringJsonObject(name, URL, email);
-		for (Iterator<MonitoringJsonObject> iterator = curr_monitors.iterator(); iterator.hasNext();) {
-			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator.next();
+		MonitoringJsonObject this_monitor = new MonitoringJsonObject(name, URL,
+				email);
+		for (Iterator<MonitoringJsonObject> iterator = curr_monitors.iterator(); iterator
+				.hasNext();) {
+			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator
+					.next();
 			if (carMonitoringJsonObject.equals(this_monitor)) {
 				iterator.remove();
 				found = true;
@@ -170,10 +166,11 @@ public class AdsMonitorController {
 			return;
 		// kill thread
 		try {
-			for (Iterator<Thread> iterator = monitors.iterator(); iterator.hasNext();) {
+			for (Iterator<Thread> iterator = monitors.iterator(); iterator
+					.hasNext();) {
 				Thread moinitor_thread = (Thread) iterator.next();
 				if (moinitor_thread.getName().equals(task_name)) {
-					log("Stopping: " + moinitor_thread.getName());
+					logger.log("Stopping: " + moinitor_thread.getName());
 					moinitor_thread.interrupt();
 					iterator.remove();
 					// there could only be one with the same name
@@ -181,14 +178,14 @@ public class AdsMonitorController {
 				}
 			}
 		} catch (Exception e) {
-			log("Close file");
-			log.close();
+			logger.close();
 		}
 	}
 
 	public void stopAllMonitors() {
-		log("Stopping all monitors");
-		for (Iterator<Thread> iterator = monitors.iterator(); iterator.hasNext();) {
+		logger.log("Stopping all monitors");
+		for (Iterator<Thread> iterator = monitors.iterator(); iterator
+				.hasNext();) {
 			Thread moinitor_thread = (Thread) iterator.next();
 			moinitor_thread.interrupt();
 			iterator.remove();
@@ -210,7 +207,7 @@ public class AdsMonitorController {
 	}
 
 	public void startAllMonitors() {
-		log("Starting all monitors");
+		logger.log("Starting all monitors");
 		try {
 			List<MonitoringJsonObject> list = getCurrentMonitorsFromFile();
 			for (MonitoringJsonObject carMonitoringJsonObject : list) {
@@ -219,11 +216,12 @@ public class AdsMonitorController {
 				String email = carMonitoringJsonObject.getEmail();
 				String frequency = carMonitoringJsonObject.getFrequency();
 				String monitor_name = name + "-" + URL + "-" + email;
-				if (alreadyRunning(monitor_name)){
+				if (alreadyRunning(monitor_name)) {
 					carMonitoringJsonObject.setStatus(STATUS_RUNNING);
 					continue;
 				}
-				AdsMonitor monitor = new AdsMonitor(name, URL, email, frequency, log);
+				AdsMonitor monitor = new AdsMonitor(name, URL, email,
+						frequency);
 				Thread moinitor_thread = new Thread(monitor);
 				moinitor_thread.setName(monitor_name);
 				moinitor_thread.start();
@@ -237,7 +235,7 @@ public class AdsMonitorController {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				log(e.getMessage());
+				logger.log(e.getMessage());
 			}
 
 			// write list into file
@@ -252,8 +250,9 @@ public class AdsMonitorController {
 	}
 
 	public void removeAllMonitors() {
-		log("Removing all monitors");
-		for (Iterator<Thread> iterator = monitors.iterator(); iterator.hasNext();) {
+		logger.log("Removing all monitors");
+		for (Iterator<Thread> iterator = monitors.iterator(); iterator
+				.hasNext();) {
 			Thread moinitor_thread = (Thread) iterator.next();
 			moinitor_thread.interrupt();
 			iterator.remove();
@@ -269,15 +268,18 @@ public class AdsMonitorController {
 		if (!tasks_file.exists())
 			return;
 		List<MonitoringJsonObject> list = getCurrentMonitorsFromFile();
-		for (Iterator<MonitoringJsonObject> iterator = list.iterator(); iterator.hasNext();) {
-			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator.next();
+		for (Iterator<MonitoringJsonObject> iterator = list.iterator(); iterator
+				.hasNext();) {
+			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator
+					.next();
 			String name = carMonitoringJsonObject.getName();
 			String url = carMonitoringJsonObject.getUrl();
 			String email = carMonitoringJsonObject.getEmail();
 			String frequency = carMonitoringJsonObject.getFrequency();
-			boolean isStopped = carMonitoringJsonObject.getStatus().equals(STATUS_STOPPED) ? true : false;
+			boolean isStopped = carMonitoringJsonObject.getStatus().equals(
+					STATUS_STOPPED) ? true : false;
 			if (!isStopped) {
-				log("Resuming task: " + name);
+				logger.log("Resuming task: " + name);
 				startMonitor(name, url, email, frequency);
 			}
 		}
@@ -299,11 +301,12 @@ public class AdsMonitorController {
 	}
 
 	public List<MonitoringJsonObject> getCurrentMonitorsFromFile() {
-		log("reading current monitors from file");
+		logger.log("reading current monitors from file");
 		try {
 			List<MonitoringJsonObject> list = new ArrayList<MonitoringJsonObject>();
 			if (tasks_file.exists()) {
-				BufferedReader br = new BufferedReader(new FileReader(tasks_file));
+				BufferedReader br = new BufferedReader(new FileReader(
+						tasks_file));
 				StringBuffer content = new StringBuffer();
 				String sCurrentLine;
 				while ((sCurrentLine = br.readLine()) != null) {
@@ -320,10 +323,12 @@ public class AdsMonitorController {
 				// check future tasks for exception
 				// if any exceptions found set status to "error"
 				boolean statusUpdated = false;
-				for (Iterator<Thread> iterator = monitors.iterator(); iterator.hasNext();) {
+				for (Iterator<Thread> iterator = monitors.iterator(); iterator
+						.hasNext();) {
 					Thread moinitor_thread = iterator.next();
 					if (moinitor_thread.getUncaughtExceptionHandler() == null) {
-						log("found interrupted thread -> updating status for " + moinitor_thread.getName());
+						logger.log("found interrupted thread -> updating status for "
+								+ moinitor_thread.getName());
 						// update status and remove moinitor_thread from the
 						// list
 						updateStatusToError(list, moinitor_thread);
@@ -331,7 +336,7 @@ public class AdsMonitorController {
 						statusUpdated = true;
 					}
 				}
-				log("currently running threads: " + monitors.size());
+				logger.log("currently running threads: " + monitors.size());
 				if (statusUpdated)
 					writeMonitorsIntoFile(list);
 			}
@@ -343,10 +348,14 @@ public class AdsMonitorController {
 		return null;
 	}
 
-	private void updateStatusToError(List<MonitoringJsonObject> list, Thread moinitor_thread) {
-		for (Iterator<MonitoringJsonObject> iterator = list.iterator(); iterator.hasNext();) {
-			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator.next();
-			String name = carMonitoringJsonObject.getName() + "-" + carMonitoringJsonObject.getUrl() + "-"
+	private void updateStatusToError(List<MonitoringJsonObject> list,
+			Thread moinitor_thread) {
+		for (Iterator<MonitoringJsonObject> iterator = list.iterator(); iterator
+				.hasNext();) {
+			MonitoringJsonObject carMonitoringJsonObject = (MonitoringJsonObject) iterator
+					.next();
+			String name = carMonitoringJsonObject.getName() + "-"
+					+ carMonitoringJsonObject.getUrl() + "-"
 					+ carMonitoringJsonObject.getEmail();
 			if (name.equals(moinitor_thread.getName())) {
 				carMonitoringJsonObject.setStatus(STATUS_ERROR);
@@ -360,12 +369,6 @@ public class AdsMonitorController {
 				return true;
 		}
 		return false;
-	}
-	
-	private void log(String str){
-		cal = Calendar.getInstance();
-		log.println(sdf.format(cal.getTime()) +" "+ str);
-		log.flush();
 	}
 
 	public static void main(String[] args) {
