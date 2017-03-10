@@ -12,8 +12,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class Analyzer {
-	
+
 	boolean CHECK_TUE_FRI = false;
+	// https://www.nationale-loterij.be/nl/onze-spelen/euromillions/resultaten
 	String HISTORY_DATA_FILE = "./files/EuroMillionsGameData.csv";
 	int NUMBERS_SIZE = 5;
 	int NUMBERS_RANGE = 50;
@@ -21,12 +22,12 @@ public class Analyzer {
 	int STARS_RANGE = 12;
 	List<Pair> sortedOccurrAndLastOccurNormalized;
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
-	
+
 	void computeNormalizedProbabilities(int startRow) {
-		try{
+		try {
 			BufferedReader br = new BufferedReader(new FileReader(
 					HISTORY_DATA_FILE));
-			
+
 			Calendar c = Calendar.getInstance();
 			String[] strNumbers;
 			int counter = 0;
@@ -43,43 +44,48 @@ public class Analyzer {
 
 			while ((sCurrentLine = br.readLine()) != null) {
 				strNumbers = sCurrentLine.split(";");
-				
-				if(CHECK_TUE_FRI){
-					c.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(strNumbers[0]));
+
+				if (CHECK_TUE_FRI) {
+					c.setTime(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(strNumbers[0]));
 					int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-					if(dayOfWeek != 3)
+					if (dayOfWeek != 3)
 						continue;
 				}
-				
+
 				counter++;
 				for (int i = 1; i <= NUMBERS_SIZE; i++) {
 					int number = Integer.parseInt(strNumbers[i]);
 					occurrences[number - 1]++;
-					if(lastOccurred[number - 1]==0)
+					if (lastOccurred[number - 1] == 0)
 						lastOccurred[number - 1] = counter;
 				}
-				for (int i = NUMBERS_SIZE+1; i <= NUMBERS_SIZE+STARS_SIZE; i++) {
+				for (int i = NUMBERS_SIZE + 1; i <= NUMBERS_SIZE + STARS_SIZE; i++) {
 					int number = Integer.parseInt(strNumbers[i]);
 					occurrencesStars[number - 1]++;
-					if(lastOccurredStars[number - 1]==0)
+					if (lastOccurredStars[number - 1] == 0)
 						lastOccurredStars[number - 1] = counter;
 				}
 			}
 			br.close();
-			
-			//compute normalised arrays
+
+			// compute normalised arrays
 			double[] occurrencesNormalized = normalizeArray(occurrences);
 			double[] occurrencesStarsNormalized = normalizeArray(occurrencesStars);
 			double[] lastOccurredNormalized = normalizeArray(lastOccurred);
 			double[] lastOccurredStarsNormalized = normalizeArray(lastOccurredStars);
-			
-			//combine normalised arrays
-			Double[] occurrAndLastOccurNormalized = combineNormalizedArrays(occurrencesNormalized, lastOccurredNormalized);
-			Double[] occurrAndLastOccurStarsNormalized = combineNormalizedArrays(occurrencesStarsNormalized, lastOccurredStarsNormalized);
-			
+
+			// combine normalised arrays
+			Double[] occurrAndLastOccurNormalized = combineNormalizedArrays(
+					occurrencesNormalized, lastOccurredNormalized);
+			Double[] occurrAndLastOccurStarsNormalized = combineNormalizedArrays(
+					occurrencesStarsNormalized, lastOccurredStarsNormalized);
+
+			Integer[] occurrencesClone = occurrences.clone();
+			Integer[] occurrencesStarsClone = occurrencesStars.clone();
 			Integer[] lastOccurredClone = lastOccurred.clone();
 			Integer[] lastOccurredStarsClone = lastOccurredStars.clone();
-			
+
 			System.out.println("counter: " + counter);
 
 			// create sorted pairs
@@ -94,52 +100,88 @@ public class Analyzer {
 			for (int i = 0; i < sortedOccurrences.size(); i++) {
 				Pair occurrPair = sortedOccurrences.get(i);
 				Pair lastOccurredPair = sortedLastOccurred.get(i);
-				Pair sortedOccurrAndLastOccurNormalizedPair = sortedOccurrAndLastOccurNormalized.get(i);
-//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredClone[occurrPair.number-1] + " - " +lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
-				System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence +","+sortedOccurrAndLastOccurNormalizedPair.number + "," + sortedOccurrAndLastOccurNormalizedPair.occurrence);
+				Pair sortedOccurrAndLastOccurNormalizedPair = sortedOccurrAndLastOccurNormalized
+						.get(i);
+				// System.out.println(occurrPair.number + " : " +
+				// occurrPair.occurrence + " - " +
+				// lastOccurredClone[occurrPair.number-1] + " - "
+				// +lastOccurredPair.number + " : " +
+				// lastOccurredPair.occurrence);
+				System.out.println(occurrPair.number + ","
+						+ occurrPair.occurrence + ","
+						+ lastOccurredClone[occurrPair.number - 1] + ","
+						+ " -- " +","
+						+ lastOccurredPair.number + ","
+						+ lastOccurredPair.occurrence + ","
+						+ occurrencesClone[lastOccurredPair.number - 1] + ","
+						+ " -- " +","
+						+ sortedOccurrAndLastOccurNormalizedPair.number + ","
+						+ sortedOccurrAndLastOccurNormalizedPair.occurrence);
 			}
 
 			System.out.println("STARS");
 			for (int i = 0; i < sortedOccurrencesStars.size(); i++) {
 				Pair occurrPair = sortedOccurrencesStars.get(i);
 				Pair lastOccurredPair = sortedLastOccurredStars.get(i);
-				Pair sortedOccurrAndLastOccurStarsNormalizedPair = sortedOccurrAndLastOccurStarsNormalized.get(i);
-//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredStarsClone[occurrPair.number-1] + " - "+lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
-				System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredStarsClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence +","+sortedOccurrAndLastOccurStarsNormalizedPair.number + "," + sortedOccurrAndLastOccurStarsNormalizedPair.occurrence);
+				Pair sortedOccurrAndLastOccurStarsNormalizedPair = sortedOccurrAndLastOccurStarsNormalized
+						.get(i);
+				// System.out.println(occurrPair.number + " : " +
+				// occurrPair.occurrence + " - " +
+				// lastOccurredStarsClone[occurrPair.number-1] +
+				// " - "+lastOccurredPair.number + " : " +
+				// lastOccurredPair.occurrence);
+				System.out
+						.println(occurrPair.number
+								+ ","
+								+ occurrPair.occurrence
+								+ ","
+								+ lastOccurredStarsClone[occurrPair.number - 1]
+								+ ","
+								+ " -- " +","
+								+ lastOccurredPair.number
+								+ ","
+								+ lastOccurredPair.occurrence
+								+ ","
+								+ occurrencesStarsClone[lastOccurredPair.number - 1]
+								+ ","
+								+ " -- " +","
+								+ sortedOccurrAndLastOccurStarsNormalizedPair.number
+								+ ","
+								+ sortedOccurrAndLastOccurStarsNormalizedPair.occurrence);
 			}
 
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private Integer[] zeroIntegerArray(int size){
+
+	private Integer[] zeroIntegerArray(int size) {
 		Integer[] array = new Integer[size];
 		for (int i = 0; i < array.length; i++) {
 			array[i] = 0;
 		}
 		return array;
 	}
-	
-	private double[] normalizeArray(Integer[] array){
+
+	private double[] normalizeArray(Integer[] array) {
 		double[] normalizedArray = new double[array.length];
 		int min = Collections.min(Arrays.asList(array));
 		int max = Collections.max(Arrays.asList(array));
 		int delta = max - min;
 		for (int i = 0; i < array.length; i++) {
-			normalizedArray[i] = (double)(array[i] - min)/delta;
+			normalizedArray[i] = (double) (array[i] - min) / delta;
 		}
 		return normalizedArray;
 	}
-	
-	private Double[] combineNormalizedArrays(double[] array1, double[] array2){
+
+	private Double[] combineNormalizedArrays(double[] array1, double[] array2) {
 		Double[] combinedArray = new Double[array1.length];
 		for (int i = 0; i < array1.length; i++) {
 			combinedArray[i] = array1[i] + array2[i];
 		}
 		return combinedArray;
 	}
-	
+
 	private List<Pair> createSortedPairsList(Integer[] array) {
 		List<Pair> sortedPairsList = new ArrayList<>();
 		int count = 0;
@@ -157,7 +199,7 @@ public class Analyzer {
 		}
 		return sortedPairsList;
 	}
-	
+
 	private List<Pair> createSortedPairsList(Double[] array) {
 		List<Pair> sortedPairsList = new ArrayList<>();
 		int count = 0;
@@ -185,7 +227,7 @@ public class Analyzer {
 	}
 
 	public class Pair {
-		public int number; 
+		public int number;
 		public Object occurrence;
 
 		public Pair(int number, Object occurrence) {
