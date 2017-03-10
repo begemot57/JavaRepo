@@ -14,6 +14,7 @@ import java.util.List;
 public class Analyzer {
 	
 	boolean CHECK_TUE_FRI = false;
+	boolean ENABLE_PRINT = false;
 	String HISTORY_DATA_FILE = "./files/EuroMillionsGameData.csv";
 	int NUMBERS_SIZE = 5;
 	int NUMBERS_RANGE = 50;
@@ -21,6 +22,9 @@ public class Analyzer {
 	int STARS_RANGE = 12;
 	List<Pair> sortedOccurrAndLastOccurNormalized;
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
+	
+	public List<Integer> winningNumbersForTest;
+	public List<Integer> winningStarsForTest;
 	
 	void computeNormalizedProbabilities(int startRow) {
 		try{
@@ -37,8 +41,20 @@ public class Analyzer {
 
 			// drop first line
 			String sCurrentLine = br.readLine();
+			// drop starRow lines and save result for testing
+			winningNumbersForTest = new ArrayList<Integer>();
+			winningStarsForTest = new ArrayList<Integer>();
 			for (int i = 0; i < startRow; i++) {
-				br.readLine();
+				sCurrentLine = br.readLine();
+				if(i == startRow - 1){
+					strNumbers = sCurrentLine.split(";");
+					for (int j = 1; j <= NUMBERS_SIZE; j++) {
+						winningNumbersForTest.add(Integer.parseInt(strNumbers[j]));
+					}
+					for (int j = NUMBERS_SIZE+1; j <= NUMBERS_SIZE+STARS_SIZE; j++) {
+						winningStarsForTest.add(Integer.parseInt(strNumbers[j]));
+					}
+				}
 			}
 
 			while ((sCurrentLine = br.readLine()) != null) {
@@ -80,8 +96,6 @@ public class Analyzer {
 			Integer[] lastOccurredClone = lastOccurred.clone();
 			Integer[] lastOccurredStarsClone = lastOccurredStars.clone();
 			
-			System.out.println("counter: " + counter);
-
 			// create sorted pairs
 			List<Pair> sortedOccurrences = createSortedPairsList(occurrences);
 			List<Pair> sortedOccurrencesStars = createSortedPairsList(occurrencesStars);
@@ -90,22 +104,25 @@ public class Analyzer {
 			sortedOccurrAndLastOccurNormalized = createSortedPairsList(occurrAndLastOccurNormalized);
 			sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
 
-			System.out.println("NUMBERS");
-			for (int i = 0; i < sortedOccurrences.size(); i++) {
-				Pair occurrPair = sortedOccurrences.get(i);
-				Pair lastOccurredPair = sortedLastOccurred.get(i);
-				Pair sortedOccurrAndLastOccurNormalizedPair = sortedOccurrAndLastOccurNormalized.get(i);
-//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredClone[occurrPair.number-1] + " - " +lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
-				System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence +","+sortedOccurrAndLastOccurNormalizedPair.number + "," + sortedOccurrAndLastOccurNormalizedPair.occurrence);
-			}
-
-			System.out.println("STARS");
-			for (int i = 0; i < sortedOccurrencesStars.size(); i++) {
-				Pair occurrPair = sortedOccurrencesStars.get(i);
-				Pair lastOccurredPair = sortedLastOccurredStars.get(i);
-				Pair sortedOccurrAndLastOccurStarsNormalizedPair = sortedOccurrAndLastOccurStarsNormalized.get(i);
-//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredStarsClone[occurrPair.number-1] + " - "+lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
-				System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredStarsClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence +","+sortedOccurrAndLastOccurStarsNormalizedPair.number + "," + sortedOccurrAndLastOccurStarsNormalizedPair.occurrence);
+			if(ENABLE_PRINT){
+				System.out.println("counter: " + counter);
+				System.out.println("NUMBERS");
+				for (int i = 0; i < sortedOccurrences.size(); i++) {
+					Pair occurrPair = sortedOccurrences.get(i);
+					Pair lastOccurredPair = sortedLastOccurred.get(i);
+					Pair sortedOccurrAndLastOccurNormalizedPair = sortedOccurrAndLastOccurNormalized.get(i);
+	//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredClone[occurrPair.number-1] + " - " +lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
+					System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence +","+sortedOccurrAndLastOccurNormalizedPair.number + "," + sortedOccurrAndLastOccurNormalizedPair.occurrence);
+				}
+	
+				System.out.println("STARS");
+				for (int i = 0; i < sortedOccurrencesStars.size(); i++) {
+					Pair occurrPair = sortedOccurrencesStars.get(i);
+					Pair lastOccurredPair = sortedLastOccurredStars.get(i);
+					Pair sortedOccurrAndLastOccurStarsNormalizedPair = sortedOccurrAndLastOccurStarsNormalized.get(i);
+	//				System.out.println(occurrPair.number + " : " + occurrPair.occurrence + " - " + lastOccurredStarsClone[occurrPair.number-1] + " - "+lastOccurredPair.number + " : " + lastOccurredPair.occurrence);
+					System.out.println(occurrPair.number + "," + occurrPair.occurrence + "," + lastOccurredStarsClone[occurrPair.number-1] + "," +lastOccurredPair.number + "," + lastOccurredPair.occurrence +","+sortedOccurrAndLastOccurStarsNormalizedPair.number + "," + sortedOccurrAndLastOccurStarsNormalizedPair.occurrence);
+				}
 			}
 
 		} catch (IOException | ParseException e) {
