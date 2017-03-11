@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StatisticsCollector {
@@ -75,6 +77,31 @@ public class StatisticsCollector {
 		}
 	}
 
+	private void mostProbableNumberWith(int k) {
+		Integer[] occurences = new Integer[NUMBERS_RANGE];
+		for (int i = 0; i < occurences.length; i++) {
+				occurences[i] = 0;
+		}
+		int kCounter = 0;
+		for (int i = 0; i < numbers.size(); i++) {
+			List<Integer> row = numbers.get(i);
+			if (row.contains(k)) {
+				kCounter++;
+				for (int j = 0; j < NUMBERS_RANGE; j++) {
+					if(j+1 == k)
+						continue;
+					if (row.contains(j + 1))
+						occurences[j]++;
+				}
+			}
+		}
+		int max = Collections.max(Arrays.asList(occurences));
+		for (int i = 0; i < occurences.length; i++) {
+			if(max == occurences[i])
+				System.out.println(k+","+(i+1)+" - "+getPercentage(occurences[i], kCounter));
+		}
+	}
+	
 	// 10s, 20s, 30s, 40s, 50s
 	// Even/odd
 	private void basicStatistics() {
@@ -250,7 +277,8 @@ public class StatisticsCollector {
 		StatisticsCollector stats = new StatisticsCollector();
 		stats.readNumbers(0);
 //		stats.basicStatistics();
-		stats.pairsOccurrence();
+//		stats.pairsOccurrence();
+		stats.mostProbableNumberWith(1);
 	}
 
 }
