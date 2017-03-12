@@ -77,7 +77,7 @@ public class StatisticsCollector {
 		}
 	}
 
-	private void mostProbableNumberWith(int k) {
+	public List<Integer> mostProbableNumberWith(int k) {
 		Integer[] occurences = new Integer[NUMBERS_RANGE];
 		for (int i = 0; i < occurences.length; i++) {
 				occurences[i] = 0;
@@ -95,11 +95,15 @@ public class StatisticsCollector {
 				}
 			}
 		}
+		List<Integer> results = new ArrayList<Integer>();
 		int max = Collections.max(Arrays.asList(occurences));
 		for (int i = 0; i < occurences.length; i++) {
-			if(max == occurences[i])
-				System.out.println(k+","+(i+1)+" - "+getPercentage(occurences[i], kCounter));
+			if(max == occurences[i]){
+//				System.out.println(k+","+(i+1)+" - "+getPercentage(occurences[i], kCounter));
+				results.add(i+1);
+			}
 		}
+		return results;
 	}
 	
 	// 10s, 20s, 30s, 40s, 50s
@@ -269,6 +273,26 @@ public class StatisticsCollector {
 	private double getPercentage(int part, int all) {
 		return ((double) part / all) * 100;
 	}
+	
+	//n is number of same numbers in two consecutive draws
+	private void sameNumberInTwoConsecutiveDraws(int n){
+		int counter = 0;
+		for (int i = 0; i < numbers.size()-1; i++) {
+			List<Integer> row1 = numbers.get(i);
+			List<Integer> row2 = numbers.get(i+1);
+			int c = 0;
+			for (int j = 0; j < row1.size(); j++) {
+				if(row2.contains(row1.get(j))){
+					c++;
+					if(c == n){
+						counter++;
+						break;
+					}
+				}
+			}
+		}
+		System.out.println("sameNumberInTwoConsecutiveDraws: "+getPercentage(counter, numbers.size()));
+	}
 
 	/**
 	 * @param args
@@ -278,7 +302,8 @@ public class StatisticsCollector {
 		stats.readNumbers(0);
 //		stats.basicStatistics();
 //		stats.pairsOccurrence();
-		stats.mostProbableNumberWith(1);
+//		stats.mostProbableNumberWith(1);
+		stats.sameNumberInTwoConsecutiveDraws(1);
 	}
 
 }

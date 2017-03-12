@@ -15,12 +15,15 @@ public class Analyzer {
 
 	boolean CHECK_TUE_FRI = false;
 	boolean ENABLE_PRINT = false;
+	static int GO_BACK_DRAWS = 1;
 	// https://www.nationale-loterij.be/nl/onze-spelen/euromillions/resultaten
 	String HISTORY_DATA_FILE = "./files/EuroMillionsGameData.csv";
 	int NUMBERS_SIZE = 5;
 	int NUMBERS_RANGE = 50;
 	int STARS_SIZE = 2;
 	int STARS_RANGE = 12;
+	double NORMALIZED_OCCURRENCE_WIGHT = 1.5;
+	double NORMALIZED_LAST_OCCURRED_WIGHT = 1;
 	List<Pair> sortedOccurrAndLastOccurNormalized;
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
 	
@@ -111,6 +114,9 @@ public class Analyzer {
 			sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
 
 			if(ENABLE_PRINT){
+				StatisticsCollector stats = new StatisticsCollector();
+				stats.readNumbers(GO_BACK_DRAWS);
+				
 				System.out.println("counter: " + counter);
 				System.out.println("NUMBERS");
 				for (int i = 0; i < sortedOccurrences.size(); i++) {
@@ -132,7 +138,8 @@ public class Analyzer {
 							+ occurrencesClone[lastOccurredPair.number - 1] + ","
 							+ " -- " +","
 							+ sortedOccurrAndLastOccurNormalizedPair.number + ","
-							+ sortedOccurrAndLastOccurNormalizedPair.occurrence);
+							+ sortedOccurrAndLastOccurNormalizedPair.occurrence + ","
+							+ stats.mostProbableNumberWith(sortedOccurrAndLastOccurNormalizedPair.number));
 				}
 
 				System.out.println("STARS");
@@ -194,7 +201,7 @@ public class Analyzer {
 	private Double[] combineNormalizedArrays(double[] array1, double[] array2) {
 		Double[] combinedArray = new Double[array1.length];
 		for (int i = 0; i < array1.length; i++) {
-			combinedArray[i] = array1[i] + array2[i];
+			combinedArray[i] = array1[i]*NORMALIZED_OCCURRENCE_WIGHT + array2[i]*NORMALIZED_LAST_OCCURRED_WIGHT;
 		}
 		return combinedArray;
 	}
@@ -240,7 +247,7 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) {
 		Analyzer a = new Analyzer();
-		a.computeNormalizedProbabilities(0);
+		a.computeNormalizedProbabilities(GO_BACK_DRAWS);
 	}
 
 	public class Pair {
