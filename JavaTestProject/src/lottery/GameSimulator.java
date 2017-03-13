@@ -25,11 +25,12 @@ public class GameSimulator {
 	int WIN_5_2 = 17000000;
 	
 	void run(){
-		Analyzer a = new Analyzer();
+		Analyzer a;
 		double balance = START_SUM;
 		System.out.println("balance: "+balance);
 		for (int i = 500; i > 0; i--) {
-			a.computeNormalizedProbabilities(i);
+			a = new Analyzer(i, false);
+			a.computeNormalizedProbabilities();
 			List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
 			List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
 			List<Integer> winNumbers = getWinNumbers(sortedNumbersProbabilities);
@@ -49,29 +50,29 @@ public class GameSimulator {
 		List<Integer> numbers = a.winningNumbersForTest;
 		List<Integer> stars = a.winningStarsForTest;
 		
-//		System.out.print("Real: ");
-//		for (int i = 0; i < numbers.size(); i++) {
-//			System.out.print(numbers.get(i)+" ");
-//		}
-//		for (int i = 0; i < stars.size(); i++) {
-//			System.out.print(stars.get(i)+" ");
-//		}
-//		System.out.println();
+		System.out.print("Real: ");
+		for (int i = 0; i < numbers.size(); i++) {
+			System.out.print(numbers.get(i)+" ");
+		}
+		for (int i = 0; i < stars.size(); i++) {
+			System.out.print(stars.get(i)+" ");
+		}
+		System.out.println();
 		
 		int numCounter = 0;
-//		System.out.print("My n: ");
+		System.out.print("My n: ");
 		for (int i = 0; i < winNumbers.size(); i++) {
-//			System.out.print(winNumbers.get(i)+" ");
+			System.out.print(winNumbers.get(i)+" ");
 			if(numbers.contains(winNumbers.get(i)))
 				numCounter++;
 		}
 		int starsCounter = 0;
 		for (int i = 0; i < winStars.size(); i++) {
-//			System.out.print(winStars.get(i)+" ");
+			System.out.print(winStars.get(i)+" ");
 			if(stars.contains(winStars.get(i)))
 				starsCounter++;
 		}
-//		System.out.println();
+		System.out.println();
 		if(numCounter == 1 && starsCounter == 2)
 			return WIN_1_2;
 		if(numCounter == 2 && starsCounter == 1)

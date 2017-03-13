@@ -14,23 +14,31 @@ import java.util.List;
 public class Analyzer {
 
 	boolean CHECK_TUE_FRI = false;
-	boolean ENABLE_PRINT = false;
-	static int GO_BACK_DRAWS = 1;
+	boolean ENABLE_PRINT = true;
 	// https://www.nationale-loterij.be/nl/onze-spelen/euromillions/resultaten
 	String HISTORY_DATA_FILE = "./files/EuroMillionsGameData.csv";
 	int NUMBERS_SIZE = 5;
 	int NUMBERS_RANGE = 50;
 	int STARS_SIZE = 2;
 	int STARS_RANGE = 12;
-	double NORMALIZED_OCCURRENCE_WIGHT = 1.5;
-	double NORMALIZED_LAST_OCCURRED_WIGHT = 1;
+	double WEIGHT_NORMALIZED_OCCURRENCES = 1.5;
+	double WEIGHT_NORMALIZED_LAST_OCCURRED = 1;
 	List<Pair> sortedOccurrAndLastOccurNormalized;
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
+	
+	int startRow;
+	StatisticsCollector sc;
 	
 	public List<Integer> winningNumbersForTest;
 	public List<Integer> winningStarsForTest;
 	
-	void computeNormalizedProbabilities(int startRow) {
+	public Analyzer(int startRow, boolean print){
+		ENABLE_PRINT = print;
+		this.startRow = startRow;
+		sc = new StatisticsCollector(startRow);
+	}
+	
+	void computeNormalizedProbabilities() {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(
 					HISTORY_DATA_FILE));
@@ -90,7 +98,8 @@ public class Analyzer {
 
 			// compute normalised arrays
 			double[] occurrencesNormalized = normalizeArray(occurrences);
-			double[] occurrencesStarsNormalized = normalizeArray(occurrencesStars);
+			Integer[] preparatedStarsOccurrences = preparateStarsOccurrences(occurrencesStars);
+			double[] occurrencesStarsNormalized = normalizeArray(preparatedStarsOccurrences);
 			double[] lastOccurredNormalized = normalizeArray(lastOccurred);
 			double[] lastOccurredStarsNormalized = normalizeArray(lastOccurredStars);
 
@@ -114,9 +123,6 @@ public class Analyzer {
 			sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
 
 			if(ENABLE_PRINT){
-				StatisticsCollector stats = new StatisticsCollector();
-				stats.readNumbers(GO_BACK_DRAWS);
-				
 				System.out.println("counter: " + counter);
 				System.out.println("NUMBERS");
 				for (int i = 0; i < sortedOccurrences.size(); i++) {
@@ -139,7 +145,7 @@ public class Analyzer {
 							+ " -- " +","
 							+ sortedOccurrAndLastOccurNormalizedPair.number + ","
 							+ sortedOccurrAndLastOccurNormalizedPair.occurrence + ","
-							+ stats.mostProbableNumberWith(sortedOccurrAndLastOccurNormalizedPair.number));
+							+ sc.mostProbableNumberWith(sortedOccurrAndLastOccurNormalizedPair.number, false));
 				}
 
 				System.out.println("STARS");
@@ -186,6 +192,19 @@ public class Analyzer {
 		}
 		return array;
 	}
+	
+	//10,11 started around 6 years ago
+	//12 started around 1 year ago
+	//we need to cope with that
+	Integer[] preparateStarsOccurrences(Integer[] array){
+		Integer[] result = new Integer[array.length];
+		
+		for (int i = 0; i < array.length; i++) {
+			int noDrawsHasIt = sc.findFirstStar(i+1, false);
+			result[i] = (array[i]*1000)/noDrawsHasIt;
+		}
+		return result;
+	}
 
 	private double[] normalizeArray(Integer[] array) {
 		double[] normalizedArray = new double[array.length];
@@ -201,7 +220,7 @@ public class Analyzer {
 	private Double[] combineNormalizedArrays(double[] array1, double[] array2) {
 		Double[] combinedArray = new Double[array1.length];
 		for (int i = 0; i < array1.length; i++) {
-			combinedArray[i] = array1[i]*NORMALIZED_OCCURRENCE_WIGHT + array2[i]*NORMALIZED_LAST_OCCURRED_WIGHT;
+			combinedArray[i] = array1[i]*WEIGHT_NORMALIZED_OCCURRENCES + array2[i]*WEIGHT_NORMALIZED_LAST_OCCURRED;
 		}
 		return combinedArray;
 	}
@@ -246,8 +265,8 @@ public class Analyzer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Analyzer a = new Analyzer();
-		a.computeNormalizedProbabilities(GO_BACK_DRAWS);
+		Analyzer a = new Analyzer(0, true);
+		a.computeNormalizedProbabilities();
 	}
 
 	public class Pair {

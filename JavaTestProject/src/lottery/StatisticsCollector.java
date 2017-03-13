@@ -20,7 +20,11 @@ public class StatisticsCollector {
 	List<List<Integer>> numbers = new ArrayList<List<Integer>>();
 	List<List<Integer>> stars = new ArrayList<List<Integer>>();
 
-	void readNumbers(int startRow) {
+	public StatisticsCollector(int startRow){
+		readNumbers(startRow);
+	}
+	
+	private void readNumbers(int startRow) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(HISTORY_DATA_FILE));
 
@@ -77,7 +81,7 @@ public class StatisticsCollector {
 		}
 	}
 
-	public List<Integer> mostProbableNumberWith(int k) {
+	public List<Integer> mostProbableNumberWith(int k, boolean print) {
 		Integer[] occurences = new Integer[NUMBERS_RANGE];
 		for (int i = 0; i < occurences.length; i++) {
 				occurences[i] = 0;
@@ -99,7 +103,8 @@ public class StatisticsCollector {
 		int max = Collections.max(Arrays.asList(occurences));
 		for (int i = 0; i < occurences.length; i++) {
 			if(max == occurences[i]){
-//				System.out.println(k+","+(i+1)+" - "+getPercentage(occurences[i], kCounter));
+				if(print)
+					System.out.println(k+","+(i+1)+" - "+getPercentage(occurences[i], kCounter));
 				results.add(i+1);
 			}
 		}
@@ -293,17 +298,32 @@ public class StatisticsCollector {
 		}
 		System.out.println("sameNumberInTwoConsecutiveDraws: "+getPercentage(counter, numbers.size()));
 	}
+	
+	public int findFirstStar(int s, boolean print){
+		if(print)
+			System.out.println("number of draws: "+stars.size());
+		for (int i = stars.size()-1; i >= 0 ; i--) {
+			if(stars.get(i).contains(s)){
+				if(print)
+					System.out.println(s+" first in row " + i + " from today");
+				return i;
+			}
+		}
+		if(print)
+			System.out.println(s+" not found");
+		return -1;
+	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		StatisticsCollector stats = new StatisticsCollector();
-		stats.readNumbers(0);
+		StatisticsCollector stats = new StatisticsCollector(0);
 //		stats.basicStatistics();
 //		stats.pairsOccurrence();
 //		stats.mostProbableNumberWith(1);
-		stats.sameNumberInTwoConsecutiveDraws(1);
+//		stats.sameNumberInTwoConsecutiveDraws(1);
+		stats.findFirstStar(2, true);
 	}
 
 }
