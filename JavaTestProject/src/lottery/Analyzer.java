@@ -25,6 +25,8 @@ public class Analyzer {
 	double WEIGHT_NORMALIZED_LAST_OCCURRED = 1;
 	List<Pair> sortedOccurrAndLastOccurNormalized;
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
+	List<Pair> sortedLastOccurred;
+	List<Pair> sortedLastOccurredStars;
 	
 	int startRow;
 	StatisticsCollector sc;
@@ -117,8 +119,8 @@ public class Analyzer {
 			// create sorted pairs
 			List<Pair> sortedOccurrences = createSortedPairsList(occurrences);
 			List<Pair> sortedOccurrencesStars = createSortedPairsList(occurrencesStars);
-			List<Pair> sortedLastOccurred = createSortedPairsList(lastOccurred);
-			List<Pair> sortedLastOccurredStars = createSortedPairsList(lastOccurredStars);
+			sortedLastOccurred = createSortedPairsList(lastOccurred);
+			sortedLastOccurredStars = createSortedPairsList(lastOccurredStars);
 			sortedOccurrAndLastOccurNormalized = createSortedPairsList(occurrAndLastOccurNormalized);
 			sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
 
