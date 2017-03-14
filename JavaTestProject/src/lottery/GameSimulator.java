@@ -1,7 +1,6 @@
 package lottery;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +34,8 @@ public class GameSimulator {
 			a.computeNormalizedProbabilities();
 			List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
 			List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
-			List<Integer> winNumbers = getWinNumbers2(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
+//			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
+			List<Integer> winNumbers = getWinNumbers3(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 			List<Integer> winStars = getWinStars(sortedStarsProbabilities);
 			double result = evaluateResult(a, winNumbers, winStars);
 			if(result > 0)
@@ -63,14 +63,14 @@ public class GameSimulator {
 		
 		int numCounter = 0;
 		System.out.print("My n: ");
-		Collections.sort(winNumbers);
+//		Collections.sort(winNumbers);
 		for (int i = 0; i < winNumbers.size(); i++) {
 			System.out.print(winNumbers.get(i)+" ");
 			if(numbers.contains(winNumbers.get(i)))
 				numCounter++;
 		}
 		int starsCounter = 0;
-		Collections.sort(winStars);
+//		Collections.sort(winStars);
 		for (int i = 0; i < winStars.size(); i++) {
 			System.out.print(winStars.get(i)+" ");
 			if(stars.contains(winStars.get(i)))
@@ -107,6 +107,47 @@ public class GameSimulator {
 		return -TICKET_PRICE;
 	}
 	
+	//1. get 5 numbers from last draw
+	//2. for each of those numbers, 
+	//check if any of the first 5 from sortedNumbersProbabilities are mostProbableNumberWith() 
+	//3. if so take one from the last draw to be the 5th number
+	List<Integer> getWinNumbers3(List<Pair> sortedNumbersProbabilities, List<Pair> sortedLastOccurred, StatisticsCollector sc){
+		List<Integer> winNumbers = new ArrayList<Integer>(5);
+//		List<Integer> mostProbablePairsForLastDraw = new ArrayList<Integer>();
+//		for (int i = sortedLastOccurred.size()-1; i > sortedLastOccurred.size()-6 ; i--) {
+//			mostProbablePairsForLastDraw.addAll(sc.mostProbableNumberWith(sortedLastOccurred.get(i).number, false));
+//		}
+		List<Integer> sortedNumbersProbabilitiesNumbers = new ArrayList<Integer>(5);
+		for (int i = 0; i < 5; i++) {
+			sortedNumbersProbabilitiesNumbers.add(sortedNumbersProbabilities.get(i).number);
+		}
+		
+		boolean stop = false;
+		for (int i = sortedLastOccurred.size()-1; i > sortedLastOccurred.size()-6 ; i--) {
+			List<Integer> mostProbableNumbers = sc.mostProbableNumberWith(sortedLastOccurred.get(i).number, false);
+			for (int j = 0; j < mostProbableNumbers.size(); j++) {
+				if(sortedNumbersProbabilitiesNumbers.contains(mostProbableNumbers.get(j))){
+					System.out.println("+++++++++++++++++++++++++++"+sortedLastOccurred.get(i).number);
+					winNumbers.add(mostProbableNumbers.get(j));
+					winNumbers.add(sortedLastOccurred.get(i).number);
+					stop = true;
+					break;
+				}
+			}
+			if(stop)
+				break;
+		}
+		
+		for (int i = 0; i < 5; i++) {
+			if(!winNumbers.contains(sortedNumbersProbabilities.get(i).number))
+				winNumbers.add(sortedNumbersProbabilities.get(i).number);
+			if(winNumbers.size() == 5)
+				break;
+		}
+		
+		return winNumbers;
+	}
+	
 	//1. get first 4 from sortedNumbersProbabilities
 	//2. for each of those numbers, 
 	//check if any of the numbers from last draw are mostProbableNumberWith() 
@@ -132,13 +173,13 @@ public class GameSimulator {
 	}
 	
 	//get first 5 from sortedNumbersProbabilities
-//	List<Integer> getWinNumbers1(List<Pair> sortedNumbersProbabilities){
-//		List<Integer> winNumbers = new ArrayList<Integer>(5);
-//		for (int j = 0; j < 5; j++) {
-//			winNumbers.add(sortedNumbersProbabilities.get(j).number);
-//		}
-//		return winNumbers;
-//	}
+	List<Integer> getWinNumbers1(List<Pair> sortedNumbersProbabilities){
+		List<Integer> winNumbers = new ArrayList<Integer>(5);
+		for (int j = 0; j < 5; j++) {
+			winNumbers.add(sortedNumbersProbabilities.get(j).number);
+		}
+		return winNumbers;
+	}
 	
 	List<Integer> getWinStars(List<Pair> sortedStarsProbabilities){
 		List<Integer> winStars = new ArrayList<Integer>(2);
