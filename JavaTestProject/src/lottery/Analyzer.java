@@ -27,19 +27,29 @@ public class Analyzer {
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
 	List<Pair> sortedLastOccurred;
 	List<Pair> sortedLastOccurredStars;
-	
+
 	int startRow;
 	StatisticsCollector sc;
-	
+
 	public List<Integer> winningNumbersForTest;
 	public List<Integer> winningStarsForTest;
-	
-	public Analyzer(int startRow, boolean print){
+
+	public Analyzer(String fileName, int numbersSize, int numbersRange,
+			int starsSize, int starsRange, int startRow, boolean print) {
+		this(startRow, print);
+		this.HISTORY_DATA_FILE = fileName;
+		this.NUMBERS_SIZE = numbersSize;
+		this.NUMBERS_RANGE = numbersRange;
+		this.STARS_SIZE = starsSize;
+		this.STARS_RANGE = starsRange;
+	}
+
+	public Analyzer(int startRow, boolean print) {
 		ENABLE_PRINT = print;
 		this.startRow = startRow;
 		sc = new StatisticsCollector(startRow);
 	}
-	
+
 	void computeNormalizedProbabilities() {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(
@@ -60,13 +70,16 @@ public class Analyzer {
 			winningStarsForTest = new ArrayList<Integer>();
 			for (int i = 0; i < startRow; i++) {
 				sCurrentLine = br.readLine();
-				if(i == startRow - 1){
+				if (i == startRow - 1) {
 					strNumbers = sCurrentLine.split(";");
 					for (int j = 1; j <= NUMBERS_SIZE; j++) {
-						winningNumbersForTest.add(Integer.parseInt(strNumbers[j]));
+						winningNumbersForTest.add(Integer
+								.parseInt(strNumbers[j]));
 					}
-					for (int j = NUMBERS_SIZE+1; j <= NUMBERS_SIZE+STARS_SIZE; j++) {
-						winningStarsForTest.add(Integer.parseInt(strNumbers[j]));
+					for (int j = NUMBERS_SIZE + 1; j <= NUMBERS_SIZE
+							+ STARS_SIZE; j++) {
+						winningStarsForTest
+								.add(Integer.parseInt(strNumbers[j]));
 					}
 				}
 			}
@@ -124,7 +137,7 @@ public class Analyzer {
 			sortedOccurrAndLastOccurNormalized = createSortedPairsList(occurrAndLastOccurNormalized);
 			sortedOccurrAndLastOccurStarsNormalized = createSortedPairsList(occurrAndLastOccurStarsNormalized);
 
-			if(ENABLE_PRINT){
+			if (ENABLE_PRINT) {
 				System.out.println("counter: " + counter);
 				System.out.println("NUMBERS");
 				for (int i = 0; i < sortedOccurrences.size(); i++) {
@@ -137,17 +150,31 @@ public class Analyzer {
 					// lastOccurredClone[occurrPair.number-1] + " - "
 					// +lastOccurredPair.number + " : " +
 					// lastOccurredPair.occurrence);
-					System.out.println(occurrPair.number + ","
-							+ occurrPair.occurrence + ","
-							+ lastOccurredClone[occurrPair.number - 1] + ","
-							+ " -- " +","
-							+ lastOccurredPair.number + ","
-							+ lastOccurredPair.occurrence + ","
-							+ occurrencesClone[lastOccurredPair.number - 1] + ","
-							+ " -- " +","
-							+ sortedOccurrAndLastOccurNormalizedPair.number + ","
-							+ sortedOccurrAndLastOccurNormalizedPair.occurrence + ","
-							+ sc.mostProbableNumberWith(sortedOccurrAndLastOccurNormalizedPair.number, false));
+					System.out
+							.println(occurrPair.number
+									+ ","
+									+ occurrPair.occurrence
+									+ ","
+									+ lastOccurredClone[occurrPair.number - 1]
+									+ ","
+									+ " -- "
+									+ ","
+									+ lastOccurredPair.number
+									+ ","
+									+ lastOccurredPair.occurrence
+									+ ","
+									+ occurrencesClone[lastOccurredPair.number - 1]
+									+ ","
+									+ " -- "
+									+ ","
+									+ sortedOccurrAndLastOccurNormalizedPair.number
+									+ ","
+									+ sortedOccurrAndLastOccurNormalizedPair.occurrence
+//									+ ","
+//									+ sc.mostProbableNumberWith(
+//											sortedOccurrAndLastOccurNormalizedPair.number,
+//											false)
+											);
 				}
 
 				System.out.println("STARS");
@@ -168,14 +195,16 @@ public class Analyzer {
 									+ ","
 									+ lastOccurredStarsClone[occurrPair.number - 1]
 									+ ","
-									+ " -- " +","
+									+ " -- "
+									+ ","
 									+ lastOccurredPair.number
 									+ ","
 									+ lastOccurredPair.occurrence
 									+ ","
 									+ occurrencesStarsClone[lastOccurredPair.number - 1]
 									+ ","
-									+ " -- " +","
+									+ " -- "
+									+ ","
 									+ sortedOccurrAndLastOccurStarsNormalizedPair.number
 									+ ","
 									+ sortedOccurrAndLastOccurStarsNormalizedPair.occurrence);
@@ -194,16 +223,16 @@ public class Analyzer {
 		}
 		return array;
 	}
-	
-	//10,11 started around 6 years ago
-	//12 started around 1 year ago
-	//we need to cope with that
-	Integer[] preparateStarsOccurrences(Integer[] array){
+
+	// 10,11 started around 6 years ago
+	// 12 started around 1 year ago
+	// we need to cope with that
+	Integer[] preparateStarsOccurrences(Integer[] array) {
 		Integer[] result = new Integer[array.length];
-		
+
 		for (int i = 0; i < array.length; i++) {
-			int noDrawsHasIt = sc.findFirstStar(i+1, false);
-			result[i] = (array[i]*1000)/noDrawsHasIt;
+			int noDrawsHasIt = sc.findFirstStar(i + 1, false);
+			result[i] = (array[i] * 1000) / noDrawsHasIt;
 		}
 		return result;
 	}
@@ -222,7 +251,8 @@ public class Analyzer {
 	private Double[] combineNormalizedArrays(double[] array1, double[] array2) {
 		Double[] combinedArray = new Double[array1.length];
 		for (int i = 0; i < array1.length; i++) {
-			combinedArray[i] = array1[i]*WEIGHT_NORMALIZED_OCCURRENCES + array2[i]*WEIGHT_NORMALIZED_LAST_OCCURRED;
+			combinedArray[i] = array1[i] * WEIGHT_NORMALIZED_OCCURRENCES
+					+ array2[i] * WEIGHT_NORMALIZED_LAST_OCCURRED;
 		}
 		return combinedArray;
 	}
@@ -263,14 +293,6 @@ public class Analyzer {
 		return sortedPairsList;
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Analyzer a = new Analyzer(0, true);
-		a.computeNormalizedProbabilities();
-	}
-
 	public class Pair {
 		public int number;
 		public Object occurrence;
@@ -289,6 +311,15 @@ public class Analyzer {
 
 	public List<Pair> getSortedOccurrAndLastOccurStarsNormalized() {
 		return sortedOccurrAndLastOccurStarsNormalized;
+	}
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+//		Analyzer a = new Analyzer(0, true);
+		Analyzer a = new Analyzer("./files/PowerBallHistory.csv", 5, 69, 1, 26, 0, true);
+		a.computeNormalizedProbabilities();
 	}
 
 }
