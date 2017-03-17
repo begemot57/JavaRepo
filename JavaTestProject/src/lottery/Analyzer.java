@@ -317,8 +317,8 @@ public class Analyzer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		Analyzer a = new Analyzer(0, true);
-		Analyzer a = new Analyzer("./files/PowerBallHistory.csv", 5, 69, 1, 26, 0, true);
+		Analyzer a = new Analyzer(0, true);
+//		Analyzer a = new Analyzer("./files/PowerBallHistory.csv", 5, 69, 1, 26, 0, true);
 		a.computeNormalizedProbabilities();
 	}
 
