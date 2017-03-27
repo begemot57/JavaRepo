@@ -34,8 +34,9 @@ public class GameSimulator {
 			a.computeNormalizedProbabilities();
 			List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
 			List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
-//			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
-			List<Integer> winNumbers = getWinNumbers3(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
+			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
+//			List<Integer> winNumbers = getWinNumbers2(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
+//			List<Integer> winNumbers = getWinNumbers3(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 			List<Integer> winStars = getWinStars(sortedStarsProbabilities);
 			double result = evaluateResult(a, winNumbers, winStars);
 			if(result > 0)
@@ -45,7 +46,6 @@ public class GameSimulator {
 			if(balance<0)
 				break;
 		}
-		
 	}
 	
 	double evaluateResult(Analyzer a, List<Integer> winNumbers, List<Integer> winStars){
