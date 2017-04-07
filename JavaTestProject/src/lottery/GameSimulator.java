@@ -3,6 +3,7 @@ package lottery;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import lottery.Analyzer.Pair;
 
@@ -34,9 +35,12 @@ public class GameSimulator {
 			a.computeNormalizedProbabilities();
 			List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
 			List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
+//			List<Integer> winNumbers = getWinNumbersRandom();
 			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
 //			List<Integer> winNumbers = getWinNumbers2(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 //			List<Integer> winNumbers = getWinNumbers3(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
+			
+//			List<Integer> winStars = getWinStarsRandom();
 			List<Integer> winStars = getWinStars(sortedStarsProbabilities);
 			double result = evaluateResult(a, winNumbers, winStars);
 			if(result > 0)
@@ -181,10 +185,40 @@ public class GameSimulator {
 		return winNumbers;
 	}
 	
+	List<Integer> getWinNumbersRandom(){
+		List<Integer> winNumbers = new ArrayList<Integer>(5);
+		int counter = 0;
+		while(counter < 5)
+		{
+			int randomNum = ThreadLocalRandom.current().nextInt(1, 51);
+			if(!winNumbers.contains(randomNum))
+			{
+				winNumbers.add(randomNum);
+				counter++;
+			}
+		}
+		return winNumbers;
+	}
+	
 	List<Integer> getWinStars(List<Pair> sortedStarsProbabilities){
 		List<Integer> winStars = new ArrayList<Integer>(2);
 		winStars.add(sortedStarsProbabilities.get(0).number);
 		winStars.add(sortedStarsProbabilities.get(1).number);
+		return winStars;
+	}
+	
+	List<Integer> getWinStarsRandom(){
+		List<Integer> winStars = new ArrayList<Integer>(5);
+		int counter = 0;
+		while(counter < 2)
+		{
+			int randomNum = ThreadLocalRandom.current().nextInt(1, 13);
+			if(!winStars.contains(randomNum))
+			{
+				winStars.add(randomNum);
+				counter++;
+			}
+		}
 		return winStars;
 	}
 	
