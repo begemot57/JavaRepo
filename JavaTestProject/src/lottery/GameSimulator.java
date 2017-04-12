@@ -1,6 +1,7 @@
 package lottery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -10,7 +11,7 @@ import lottery.Analyzer.Pair;
 public class GameSimulator {
 
 	int START_SUM = 250;
-	double TICKET_PRICE = 2.5;
+	double TICKET_PRICE = 2;
 	
 	int WIN_2 = 5;
 	int WIN_2_1 = 8;
@@ -35,14 +36,16 @@ public class GameSimulator {
 			a.computeNormalizedProbabilities();
 			List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
 			List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
-//			List<Integer> winNumbers = getWinNumbersRandom();
-			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
+//			List<List<Integer>> winNumbers = getWinNumbersRandom();
+			List<List<Integer>> winNumbers = getWinNumbersMyAndRandom(sortedNumbersProbabilities);
+//			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
 //			List<Integer> winNumbers = getWinNumbers2(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 //			List<Integer> winNumbers = getWinNumbers3(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 			
-//			List<Integer> winStars = getWinStarsRandom();
-			List<Integer> winStars = getWinStars(sortedStarsProbabilities);
-			double result = evaluateResult(a, winNumbers, winStars);
+//			List<List<Integer>> winStars = getWinStarsRandom();
+			List<List<Integer>> winStars = getWinStarsMyAndRandom(sortedStarsProbabilities);
+//			List<List<Integer> winStars = getWinStars(sortedStarsProbabilities);
+			double result = evaluateResults(a, winNumbers, winStars);
 			if(result > 0)
 				System.out.println("win: "+result);
 			balance = balance + result;
@@ -50,6 +53,14 @@ public class GameSimulator {
 			if(balance<0)
 				break;
 		}
+	}
+	
+	double evaluateResults(Analyzer a, List<List<Integer>> winNumbers, List<List<Integer>> winStars){
+		double result = 0;
+		for (int i = 0; i < winNumbers.size(); i++) {
+			result += evaluateResult(a, winNumbers.get(i), winStars.get(i));
+		}
+		return result;
 	}
 	
 	double evaluateResult(Analyzer a, List<Integer> winNumbers, List<Integer> winStars){
@@ -185,17 +196,46 @@ public class GameSimulator {
 		return winNumbers;
 	}
 	
-	List<Integer> getWinNumbersRandom(){
-		List<Integer> winNumbers = new ArrayList<Integer>(5);
+	List<List<Integer>> getWinNumbersRandom(){
+		List<List<Integer>> winNumbers = new ArrayList<List<Integer>>();
+		for (int i = 0; i < 5; i++) {
+			
+			winNumbers.add(getWinNumbersRandomOneLine());
+		}
+		return winNumbers;
+	}
+	
+	List<Integer> getWinNumbersRandomOneLine(){
+		List<Integer> currLine = new ArrayList<Integer>(5);
 		int counter = 0;
 		while(counter < 5)
 		{
 			int randomNum = ThreadLocalRandom.current().nextInt(1, 51);
-			if(!winNumbers.contains(randomNum))
+			if(!currLine.contains(randomNum))
 			{
-				winNumbers.add(randomNum);
+				currLine.add(randomNum);
 				counter++;
 			}
+		}
+		return currLine;
+	}
+	
+	List<List<Integer>> getWinNumbersMyAndRandom(List<Pair> sortedNumbersProbabilities){
+		List<List<Integer>> winNumbers = new ArrayList<List<Integer>>();
+		List<Integer> winNumbersMy = getWinNumbers1(sortedNumbersProbabilities);
+		for (int i = 0; i < 5; i++) {
+			List<Integer> fiveRandomNumbers = getWinNumbersRandomOneLine();
+			fiveRandomNumbers.remove(0);
+			fiveRandomNumbers.remove(1);
+			List<Integer> twoRandomNumbers = new ArrayList<Integer>();
+			while(twoRandomNumbers.size()<2){
+				int randomNum = ThreadLocalRandom.current().nextInt(1, 5);
+				if(!twoRandomNumbers.contains(randomNum) && !fiveRandomNumbers.contains(winNumbersMy.get(randomNum)))
+					twoRandomNumbers.add(randomNum);
+			}
+			fiveRandomNumbers.add(3, winNumbersMy.get(twoRandomNumbers.get(0)));
+			fiveRandomNumbers.add(4, winNumbersMy.get(twoRandomNumbers.get(1)));
+			winNumbers.add(fiveRandomNumbers);
 		}
 		return winNumbers;
 	}
@@ -207,28 +247,45 @@ public class GameSimulator {
 		return winStars;
 	}
 	
-	List<Integer> getWinStarsRandom(){
-		List<Integer> winStars = new ArrayList<Integer>(5);
-		int counter = 0;
-		while(counter < 2)
-		{
-			int randomNum = ThreadLocalRandom.current().nextInt(1, 13);
-			if(!winStars.contains(randomNum))
-			{
-				winStars.add(randomNum);
-				counter++;
-			}
+	List<List<Integer>> getWinStarsRandom(){
+		List<List<Integer>> winStars = new ArrayList<List<Integer>>();
+		for (int i = 0; i < 5; i++) {
+
+			winStars.add(getWinStarsRandomOneLine());
 		}
 		return winStars;
 	}
 	
-//	List<Integer> getWinStars(List<Pair> sortedStarsProbabilities){
-//		List<Integer> winStars = new ArrayList<Integer>(1);
-//		for (int j = 0; j < 2; j++) {
-//			winStars.add(sortedStarsProbabilities.get(j).number);
-//		}
-//		return winStars;
-//	}
+	List<Integer> getWinStarsRandomOneLine(){
+		List<Integer> currLine = new ArrayList<Integer>(5);
+		int counter = 0;
+		while(counter < 2)
+		{
+			int randomNum = ThreadLocalRandom.current().nextInt(1, 13);
+			if(!currLine.contains(randomNum))
+			{
+				currLine.add(randomNum);
+				counter++;
+			}
+		}
+		return currLine;
+	}
+	
+	List<List<Integer>> getWinStarsMyAndRandom(List<Pair> sortedStarsProbabilities){
+		List<List<Integer>> winStars = new ArrayList<List<Integer>>();
+		List<Integer> winStarsMy = getWinStars(sortedStarsProbabilities);
+		for (int i = 0; i < 5; i++) {
+			List<Integer> currLine = new ArrayList<Integer>();
+			currLine.add(winStarsMy.get(0));
+			while(currLine.size()<2){
+				int randomNum = ThreadLocalRandom.current().nextInt(1, 12);
+				if(!currLine.contains(randomNum))
+					currLine.add(randomNum);
+			}
+			winStars.add(currLine);
+		}
+		return winStars;
+	}
 	
 	public static void main(String[] args) {
 		GameSimulator game = new GameSimulator();
