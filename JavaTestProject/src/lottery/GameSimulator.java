@@ -229,7 +229,7 @@ public class GameSimulator {
 			fiveRandomNumbers.remove(1);
 			List<Integer> twoRandomNumbers = new ArrayList<Integer>();
 			while(twoRandomNumbers.size()<2){
-				int randomNum = ThreadLocalRandom.current().nextInt(1, 5);
+				int randomNum = ThreadLocalRandom.current().nextInt(0, 5);
 				if(!twoRandomNumbers.contains(randomNum) && !fiveRandomNumbers.contains(winNumbersMy.get(randomNum)))
 					twoRandomNumbers.add(randomNum);
 			}
