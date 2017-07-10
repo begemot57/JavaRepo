@@ -21,8 +21,10 @@ public class Analyzer {
 	int NUMBERS_RANGE = 50;
 	int STARS_SIZE = 2;
 	int STARS_RANGE = 12;
-	double WEIGHT_NORMALIZED_OCCURRENCES = 1.5;
-	double WEIGHT_NORMALIZED_LAST_OCCURRED = 1;
+	static double WEIGHT_NORMALIZED_OCCURRENCES = 0.5;
+	static double WEIGHT_NORMALIZED_LAST_OCCURRED = 0;
+	static double WEIGHT_NORMALIZED_OCCURRENCES_STARS = 1.5;
+	static double WEIGHT_NORMALIZED_LAST_OCCURRED_STARS = 1;
 	List<Pair> sortedOccurrAndLastOccurNormalized;
 	List<Pair> sortedOccurrAndLastOccurStarsNormalized;
 	List<Pair> sortedLastOccurred;
@@ -119,9 +121,9 @@ public class Analyzer {
 			double[] lastOccurredStarsNormalized = normalizeArray(lastOccurredStars);
 
 			// combine normalised arrays
-			Double[] occurrAndLastOccurNormalized = combineNormalizedArrays(
+			Double[] occurrAndLastOccurNormalized = combineNormalizedArraysNumbers(
 					occurrencesNormalized, lastOccurredNormalized);
-			Double[] occurrAndLastOccurStarsNormalized = combineNormalizedArrays(
+			Double[] occurrAndLastOccurStarsNormalized = combineNormalizedArraysStars(
 					occurrencesStarsNormalized, lastOccurredStarsNormalized);
 
 			Integer[] occurrencesClone = occurrences.clone();
@@ -141,6 +143,8 @@ public class Analyzer {
 				System.out.println("counter: " + counter);
 				System.out.println("NUMBERS");
 				for (int i = 0; i < sortedOccurrences.size(); i++) {
+					if(i == 10)
+						System.out.println("");
 					Pair occurrPair = sortedOccurrences.get(i);
 					Pair lastOccurredPair = sortedLastOccurred.get(i);
 					Pair sortedOccurrAndLastOccurNormalizedPair = sortedOccurrAndLastOccurNormalized
@@ -179,6 +183,8 @@ public class Analyzer {
 
 				System.out.println("STARS");
 				for (int i = 0; i < sortedOccurrencesStars.size(); i++) {
+					if(i == 3)
+						System.out.println("");
 					Pair occurrPair = sortedOccurrencesStars.get(i);
 					Pair lastOccurredPair = sortedLastOccurredStars.get(i);
 					Pair sortedOccurrAndLastOccurStarsNormalizedPair = sortedOccurrAndLastOccurStarsNormalized
@@ -232,6 +238,9 @@ public class Analyzer {
 
 		for (int i = 0; i < array.length; i++) {
 			int noDrawsHasIt = sc.findFirstStar(i + 1, false);
+			//since we can't divide by zero and there is no point to divide by negative number
+			if(noDrawsHasIt <= 0)
+				noDrawsHasIt = 1;
 			result[i] = (array[i] * 1000) / noDrawsHasIt;
 		}
 		return result;
@@ -248,11 +257,20 @@ public class Analyzer {
 		return normalizedArray;
 	}
 
-	private Double[] combineNormalizedArrays(double[] array1, double[] array2) {
+	private Double[] combineNormalizedArraysNumbers(double[] array1, double[] array2) {
 		Double[] combinedArray = new Double[array1.length];
 		for (int i = 0; i < array1.length; i++) {
 			combinedArray[i] = array1[i] * WEIGHT_NORMALIZED_OCCURRENCES
 					+ array2[i] * WEIGHT_NORMALIZED_LAST_OCCURRED;
+		}
+		return combinedArray;
+	}
+	
+	private Double[] combineNormalizedArraysStars(double[] array1, double[] array2) {
+		Double[] combinedArray = new Double[array1.length];
+		for (int i = 0; i < array1.length; i++) {
+			combinedArray[i] = array1[i] * WEIGHT_NORMALIZED_OCCURRENCES_STARS
+					+ array2[i] * WEIGHT_NORMALIZED_LAST_OCCURRED_STARS;
 		}
 		return combinedArray;
 	}

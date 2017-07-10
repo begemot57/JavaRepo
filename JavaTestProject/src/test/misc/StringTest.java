@@ -1,5 +1,7 @@
 package test.misc;
 
+import java.util.Arrays;
+
 public class StringTest {
 
 	/**
@@ -25,6 +27,7 @@ public class StringTest {
 	}
 	
 	void printString(String str){
+		System.out.println("stack trace: "+Arrays.toString(Thread.currentThread().getStackTrace()));
 		System.out.println("str: "+str);
 	}
 

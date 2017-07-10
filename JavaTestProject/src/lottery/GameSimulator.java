@@ -10,6 +10,13 @@ import lottery.Analyzer.Pair;
 
 public class GameSimulator {
 
+	static int CORRECT_GUESS_5_COUNTER = 0;
+	static int CORRECT_GUESS_4_COUNTER = 0;
+	static int CORRECT_GUESS_3_COUNTER = 0;
+	
+	static int CORRECT_GUESS_STARS_2_COUNTER = 0;
+	static int CORRECT_GUESS_STARS_1_COUNTER = 0;
+	
 	int START_SUM = 250;
 	double TICKET_PRICE = 2;
 	
@@ -28,34 +35,112 @@ public class GameSimulator {
 	int WIN_5_2 = 17000000;
 	
 	void run(){
+		if(CORRECT_GUESS_5_COUNTER > 0)
+			CORRECT_GUESS_5_COUNTER = 0;
+		if(CORRECT_GUESS_4_COUNTER > 0)
+			CORRECT_GUESS_4_COUNTER = 0;
+		if(CORRECT_GUESS_3_COUNTER > 0)
+			CORRECT_GUESS_3_COUNTER = 0;
+		if(CORRECT_GUESS_STARS_2_COUNTER > 0)
+			CORRECT_GUESS_STARS_2_COUNTER = 0;
+		if(CORRECT_GUESS_STARS_1_COUNTER > 0)
+			CORRECT_GUESS_STARS_1_COUNTER = 0;
+		
 		Analyzer a;
 		double balance = START_SUM;
-		System.out.println("balance: "+balance);
+//		System.out.println("balance: "+balance);
 		for (int i = 500; i > 0; i--) {
 			a = new Analyzer(i, false);
+//			System.out.println("i: "+i);
 			a.computeNormalizedProbabilities();
 			List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
 			List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
-//			List<List<Integer>> winNumbers = getWinNumbersRandom();
-			List<List<Integer>> winNumbers = getWinNumbersMyAndRandom(sortedNumbersProbabilities);
+//			List<List<Integer>> winNumbers = getWinNumbersRandom(1);
+//			List<List<Integer>> winNumbers = getWinNumbersMyAndRandom(sortedNumbersProbabilities);
 //			List<Integer> winNumbers = getWinNumbers1(sortedNumbersProbabilities);
 //			List<Integer> winNumbers = getWinNumbers2(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 //			List<Integer> winNumbers = getWinNumbers3(sortedNumbersProbabilities, a.sortedLastOccurred, a.sc);
 			
-//			List<List<Integer>> winStars = getWinStarsRandom();
-			List<List<Integer>> winStars = getWinStarsMyAndRandom(sortedStarsProbabilities);
+//			List<List<Integer>> winStars = getWinStarsRandom(1);
+//			List<Integer> winStars = getWinStars(sortedStarsProbabilities);
+//			List<List<Integer>> winStars = getWinStarsMyAndRandom(sortedStarsProbabilities);
 //			List<List<Integer> winStars = getWinStars(sortedStarsProbabilities);
-			double result = evaluateResults(a, winNumbers, winStars);
-			if(result > 0)
-				System.out.println("win: "+result);
-			balance = balance + result;
-			System.out.println("i: "+i +" balance: "+balance);
-			if(balance<0)
-				break;
+
+//			double result = evaluateResult(a, winNumbers, winStars);
+//			double result = evaluateResultsList(a, winNumbers, winStars);
+//			if(result > 0)
+//				System.out.println("win: "+result);
+//			balance = balance + result;
+//			System.out.println("i: "+i +" balance: "+balance);
+//			if(balance<0)
+//				break;
+			
+			checkWinningNoFromNfirstReccomended(a, 5, 2);
 		}
+		System.out.println("CORRECT_GUESS_5_COUNTER: "+CORRECT_GUESS_5_COUNTER);
+		System.out.println("CORRECT_GUESS_4_COUNTER: "+CORRECT_GUESS_4_COUNTER);
+		System.out.println("CORRECT_GUESS_3_COUNTER: "+CORRECT_GUESS_3_COUNTER);
+		
+		System.out.println("CORRECT_GUESS_STARS_2_COUNTER: "+CORRECT_GUESS_STARS_2_COUNTER);
+		System.out.println("CORRECT_GUESS_STARS_1_COUNTER: "+CORRECT_GUESS_STARS_1_COUNTER);
 	}
 	
-	double evaluateResults(Analyzer a, List<List<Integer>> winNumbers, List<List<Integer>> winStars){
+	//checks top nNmubers from recommended winning numbers if they contain nWinNumbers
+	//checks top nStars from recommended winning numbers if they contain nWinStars
+	void checkWinningNoFromNfirstReccomended(Analyzer a, int nNumbers, int nStars){
+		List<Pair> sortedNumbersProbabilities = a.getSortedOccurrAndLastOccurNormalized();
+		List<Pair> sortedStarsProbabilities = a.getSortedOccurrAndLastOccurStarsNormalized();
+		List<Integer> numbers = new ArrayList<Integer>();
+		List<Integer> stars = new ArrayList<Integer>();
+		for (int i = 0; i < nNumbers; i++) {
+			numbers.add(sortedNumbersProbabilities.get(i).number);
+		}
+		for (int i = 0; i < nStars; i++) {
+			stars.add(sortedStarsProbabilities.get(i).number);
+		}
+		List<Integer> wnumbers = a.winningNumbersForTest;
+		List<Integer> wstars = a.winningStarsForTest;
+		
+		int noWinNoIn = 0;
+		for (int i = 0; i < wnumbers.size(); i++) {
+			if(numbers.contains(wnumbers.get(i))){
+				noWinNoIn++;
+			}
+		}
+		
+		int noWinStarsIn = 0;
+		for (int i = 0; i < wstars.size(); i++) {
+			if(stars.contains(wstars.get(i))){
+				noWinStarsIn++;
+			}
+		}
+		
+//		if(foundAllNo)
+//			System.out.println("found "+nWinNumbers+" numbers in first "+nNumbers);
+//		if(foundAllStars)
+//			System.out.println("found "+nWinStars+" stars in first "+nStars);
+		if(noWinNoIn == 5)
+			CORRECT_GUESS_5_COUNTER++;
+		if(noWinNoIn == 4)
+			CORRECT_GUESS_4_COUNTER++;
+		if(noWinNoIn == 3)
+			CORRECT_GUESS_3_COUNTER++;
+		
+		if(noWinStarsIn == 2)
+			CORRECT_GUESS_STARS_2_COUNTER++;
+		if(noWinStarsIn == 1)
+			CORRECT_GUESS_STARS_1_COUNTER++;
+		
+		
+	}
+	
+	double evaluateResults(Analyzer a, List<Integer> winNumbers, List<Integer> winStars){
+		double result = 0;
+			result = evaluateResult(a, winNumbers, winStars);
+		return result;
+	}
+	
+	double evaluateResultsList(Analyzer a, List<List<Integer>> winNumbers, List<List<Integer>> winStars){
 		double result = 0;
 		for (int i = 0; i < winNumbers.size(); i++) {
 			result += evaluateResult(a, winNumbers.get(i), winStars.get(i));
@@ -196,9 +281,9 @@ public class GameSimulator {
 		return winNumbers;
 	}
 	
-	List<List<Integer>> getWinNumbersRandom(){
+	List<List<Integer>> getWinNumbersRandom(int noRows){
 		List<List<Integer>> winNumbers = new ArrayList<List<Integer>>();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < noRows; i++) {
 			
 			winNumbers.add(getWinNumbersRandomOneLine());
 		}
@@ -240,6 +325,7 @@ public class GameSimulator {
 		return winNumbers;
 	}
 	
+	//returns first two
 	List<Integer> getWinStars(List<Pair> sortedStarsProbabilities){
 		List<Integer> winStars = new ArrayList<Integer>(2);
 		winStars.add(sortedStarsProbabilities.get(0).number);
@@ -247,9 +333,9 @@ public class GameSimulator {
 		return winStars;
 	}
 	
-	List<List<Integer>> getWinStarsRandom(){
+	List<List<Integer>> getWinStarsRandom(int noRows){
 		List<List<Integer>> winStars = new ArrayList<List<Integer>>();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < noRows; i++) {
 
 			winStars.add(getWinStarsRandomOneLine());
 		}
