@@ -40,7 +40,6 @@ public class AdsMonitor implements Runnable {
 	private String NO_ADD = "no_add";
 	private Calendar cal;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HH:mm:ss");
-	private List<String> newAds = new ArrayList<String>(10);
 
 	public static void main(String[] args) {
 		String URL = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&price_to=3000&year_from=2003&year_to=2006&price_from=1000&transmission=Automatic";
@@ -66,6 +65,7 @@ public class AdsMonitor implements Runnable {
 		logger.log("Starting: " + toString());
 		String first_add = null;
 		int counter = 0;
+		List<String> newAds;
 		try {
 			cal = Calendar.getInstance();
 			String processId = ManagementFactory.getRuntimeMXBean().getName();
@@ -121,7 +121,7 @@ public class AdsMonitor implements Runnable {
 					sendMail("Start monitoring Donedeal.ie adds",
 							"Started monitoring this search: \n" + URL + "\nMonitoring interval: " + frequency);
 				}
-
+				newAds = new ArrayList<String>(10);
 				String currAdd;
 				for (int i = 0; i < 31; i++) {
 					currAdd = getAElementFromList("searchResultsPanel", i);
@@ -221,28 +221,6 @@ public class AdsMonitor implements Runnable {
 		return a.attr("href");
 	}
 
-	private String getAElementFromListOld(String id, int child_no) throws Exception {
-		Element results = doc.getElementById(id);
-		Element child = results.child(child_no);
-		if (child == null)
-			return "";
-		Element a = child.select("a").first();
-		// ignore third party adds
-		if (a == null) {
-			if (debugMode)
-				logger.log("Found a==null");
-			return NO_ADD;
-		}
-		// ignore spotlight
-		Elements spans = a.select(".spotlight-tab");
-		if (!spans.isEmpty()) {
-			if (debugMode)
-				logger.log("Found spotlight ad");
-			return NO_ADD;
-		}
-		return a.attr("href");
-	}
-
 	public String getURL() {
 		return URL;
 	}
@@ -285,10 +263,6 @@ public class AdsMonitor implements Runnable {
 
 	public void setLoadFromFile(boolean loadFromFile) {
 		this.loadFromFile = loadFromFile;
-	}
-
-	public List<String> getNewAds() {
-		return newAds;
 	}
 
 	@Override
