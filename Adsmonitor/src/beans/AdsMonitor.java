@@ -82,6 +82,9 @@ public class AdsMonitor implements Runnable {
 						}
 						else	
 							doc = Jsoup.connect(URL).timeout(60000).get();
+						//(count > 0) means there was at least one fail
+						if(count > 0)
+							logger.log(URL + " is back. Nuber of fails: "+ count);
 						//if above worked, leave this while loop 
 						break;
 					} catch (Exception e) {
@@ -94,8 +97,8 @@ public class AdsMonitor implements Runnable {
 							throw e;
 						} 
 						else {
- 							logger.log("Jsoup failed monitoring "+URL+" Number of fails: "+count
- 									+ "\nGonna sleep for a minute and retry");
+// 							logger.log("Jsoup failed monitoring "+URL+" Number of fails: "+count
+// 									+ "\nGonna sleep for a minute and retry");
  							Thread.sleep(60000);
 						}
 					}
