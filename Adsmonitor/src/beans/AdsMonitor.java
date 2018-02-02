@@ -73,7 +73,7 @@ public class AdsMonitor implements Runnable {
 
 				// try to reach the page five times
 				int count = 0;
-				int maxTries = 5;
+				int maxTries = 10;
 				while (true) {
 					try {
 						if(loadFromFile){
@@ -88,10 +88,15 @@ public class AdsMonitor implements Runnable {
 						// handle exception
 						if (++count == maxTries) {
 							logger.log("JSoup has thrown exception "+maxTries+" times");
-							logger.log("***************");
+							logger.log("VVVVVVVVVVVVVVV");
 							logger.log(e.getMessage());
-							logger.log("***************");
+							logger.log("^^^^^^^^^^^^^^^");
 							throw e;
+						} 
+						else {
+ 							logger.log("Jsoup failed monitoring "+URL+" Number of fails: "+count
+ 									+ "\nGonna sleep for a minute and retry");
+ 							Thread.sleep(60000);
 						}
 					}
 				}
