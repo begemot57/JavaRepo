@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.mail.Transport;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,7 +40,7 @@ public class AdsMonitor implements Runnable {
 	private String NO_ADD = "no_add";
 	private Calendar cal;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HH:mm:ss");
-	private List<String> newAds = new ArrayList<String>(10); 
+	private List<String> newAds = new ArrayList<String>(10);
 
 	public static void main(String[] args) {
 		String URL = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&price_to=3000&year_from=2003&year_to=2006&price_from=1000&transmission=Automatic";
@@ -76,30 +78,29 @@ public class AdsMonitor implements Runnable {
 				int maxTries = 10;
 				while (true) {
 					try {
-						if(loadFromFile){
+						if (loadFromFile) {
 							File input = new File(URL);
 							doc = Jsoup.parse(input, "UTF-8", "http://example.com/");
-						}
-						else	
+						} else
 							doc = Jsoup.connect(URL).timeout(60000).get();
-						//(count > 0) means there was at least one fail
-						if(count > 0)
-							logger.log(URL + " is back. Nuber of fails: "+ count);
-						//if above worked, leave this while loop 
+						// (count > 0) means there was at least one fail
+						if (count > 0)
+							logger.log(URL + " is back. Nuber of fails: " + count);
+						// if above worked, leave this while loop
 						break;
 					} catch (Exception e) {
 						// handle exception
 						if (++count == maxTries) {
-							logger.log("JSoup has thrown exception "+maxTries+" times");
+							logger.log("JSoup has thrown exception " + maxTries + " times");
 							logger.log("VVVVVVVVVVVVVVV");
 							logger.log(e.getMessage());
 							logger.log("^^^^^^^^^^^^^^^");
 							throw e;
-						} 
-						else {
-// 							logger.log("Jsoup failed monitoring "+URL+" Number of fails: "+count
-// 									+ "\nGonna sleep for a minute and retry");
- 							Thread.sleep(60000);
+						} else {
+							// logger.log("Jsoup failed monitoring "+URL+"
+							// Number of fails: "+count
+							// + "\nGonna sleep for a minute and retry");
+							Thread.sleep(60000);
 						}
 					}
 				}
@@ -116,7 +117,7 @@ public class AdsMonitor implements Runnable {
 						}
 					}
 					cal = Calendar.getInstance();
-					logger.log("Start monitoring: "+sdf.format(cal.getTime()));
+					logger.log("Start monitoring: " + sdf.format(cal.getTime()));
 					sendMail("Start monitoring Donedeal.ie adds",
 							"Started monitoring this search: \n" + URL + "\nMonitoring interval: " + frequency);
 				}
@@ -136,21 +137,21 @@ public class AdsMonitor implements Runnable {
 				}
 				if (!newAds.isEmpty()) {
 					first_add = newAds.get(0);
-					if(debugMode)
-						logger.log("Found new ads: "+Arrays.toString(newAds.toArray()));
+					if (debugMode)
+						logger.log("Found new ads: " + Arrays.toString(newAds.toArray()));
 					sendMail("New Donedeal.ie adds", Arrays.toString(newAds.toArray()));
 				}
-				//this is to see roughly when process has died
+				// this is to see roughly when process has died
 				if (counter == 100) {
 					cal = Calendar.getInstance();
-					logger.log("Still alive at: "+sdf.format(cal.getTime()));
+					logger.log("Still alive at: " + sdf.format(cal.getTime()));
 					counter = 0;
 				}
 
 				try {
 					long sleepTime = Integer.parseInt(frequency) * 1000;
-					if(debugMode)
-						logger.log("Sleep for "+sleepTime+ " mills...");
+					if (debugMode)
+						logger.log("Sleep for " + sleepTime + " mills...");
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException x) {
 					logger.log("in run() - interrupted while sleeping");
@@ -174,12 +175,33 @@ public class AdsMonitor implements Runnable {
 	private void sendMail(String subject, String body) throws Exception {
 		if (!sendEmail)
 			return;
-		String fullBody = body.concat("\nController page: "+controllerPage);
+		String fullBody = body.concat("\nController page: " + controllerPage);
 		logger.log("send email");
 		logger.log("email: " + email);
 		logger.log("subject: " + subject);
 		logger.log(fullBody);
-		SendMailTLS.send(email, subject, fullBody);
+		// try to reach the page five times
+		int count = 0;
+		int maxTries = 10;
+		while (true) {
+			try {
+				SendMailTLS.send(email, subject, fullBody);
+				// (count > 0) means there was at least one fail
+				if (count > 0)
+					logger.log("Sending mail for monitoring " + URL + " is back. Nuber of fails: " + count);
+				// if above worked, leave this while loop
+				break;
+			} catch (Exception e) {
+				// handle exception
+				if (++count == maxTries) {
+					logger.log("Failed sending mail for + " + URL + " No of fails: " + maxTries);
+					logger.log(e.getMessage());
+					throw e;
+				} else {
+					Thread.sleep(10000);
+				}
+			}
+		}
 	}
 
 	private String getAElementFromList(String id, int child_no) throws Exception {
@@ -198,7 +220,7 @@ public class AdsMonitor implements Runnable {
 			return NO_ADD;
 		return a.attr("href");
 	}
-	
+
 	private String getAElementFromListOld(String id, int child_no) throws Exception {
 		Element results = doc.getElementById(id);
 		Element child = results.child(child_no);
@@ -206,15 +228,15 @@ public class AdsMonitor implements Runnable {
 			return "";
 		Element a = child.select("a").first();
 		// ignore third party adds
-		if (a == null){
-			if(debugMode)
+		if (a == null) {
+			if (debugMode)
 				logger.log("Found a==null");
 			return NO_ADD;
 		}
 		// ignore spotlight
 		Elements spans = a.select(".spotlight-tab");
-		if (!spans.isEmpty()){
-			if(debugMode)
+		if (!spans.isEmpty()) {
+			if (debugMode)
 				logger.log("Found spotlight ad");
 			return NO_ADD;
 		}
@@ -244,7 +266,7 @@ public class AdsMonitor implements Runnable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public void setSendEmail(boolean sendEmail) {
 		this.sendEmail = sendEmail;
 	}
@@ -264,7 +286,7 @@ public class AdsMonitor implements Runnable {
 	public void setLoadFromFile(boolean loadFromFile) {
 		this.loadFromFile = loadFromFile;
 	}
-	
+
 	public List<String> getNewAds() {
 		return newAds;
 	}
