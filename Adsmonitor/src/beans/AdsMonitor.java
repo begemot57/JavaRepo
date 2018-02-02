@@ -26,7 +26,7 @@ import utils.SendMailTLS;
  */
 public class AdsMonitor implements Runnable {
 	private Document doc;
-	private String controllerPage = "http://begemot57.ddns.net:8080/Ddmonitorusers/";
+	private String controllerPage = "http://begemot57.ddns.net:8080/Adsmonitor/";
 	private String URL;
 	private String frequency;
 	private Logger logger;
@@ -74,8 +74,6 @@ public class AdsMonitor implements Runnable {
 				// try to reach the page five times
 				int count = 0;
 				int maxTries = 5;
-				if(debugMode)
-					logger.log("Monitoring URL: "+ URL);
 				while (true) {
 					try {
 						if(loadFromFile){
@@ -84,11 +82,15 @@ public class AdsMonitor implements Runnable {
 						}
 						else	
 							doc = Jsoup.connect(URL).timeout(60000).get();
+						//if above worked, leave this while loop 
 						break;
-					} catch (SocketTimeoutException e) {
+					} catch (Exception e) {
 						// handle exception
 						if (++count == maxTries) {
-							logger.log("SocketTimeoutException thrown "+maxTries+" times");
+							logger.log("JSoup has thrown exception "+maxTries+" times");
+							logger.log("***************");
+							logger.log(e.getMessage());
+							logger.log("***************");
 							throw e;
 						}
 					}
@@ -98,7 +100,7 @@ public class AdsMonitor implements Runnable {
 					logger.log("Inspect page firt time...");
 					String currAdd;
 					for (int i = 0; i < 31; i++) {
-						currAdd = getAElementFromList("cardResults", i);
+						currAdd = getAElementFromList("searchResultsPanel", i);
 						// ignore third party adds and spotlights
 						if (!currAdd.isEmpty() && !currAdd.equals(NO_ADD)) {
 							first_add = currAdd;
@@ -113,7 +115,7 @@ public class AdsMonitor implements Runnable {
 
 				String currAdd;
 				for (int i = 0; i < 31; i++) {
-					currAdd = getAElementFromList("cardResults", i);
+					currAdd = getAElementFromList("searchResultsPanel", i);
 					if (currAdd.equals(NO_ADD))
 						continue;
 					if (currAdd.isEmpty())
@@ -173,6 +175,23 @@ public class AdsMonitor implements Runnable {
 	}
 
 	private String getAElementFromList(String id, int child_no) throws Exception {
+		Element panel = doc.getElementById(id);
+		Element results = panel.select("ul").first();
+		Element child = results.child(child_no);
+		if (child == null)
+			return "";
+		Element a = child.select("a").first();
+		// ignore third party adds
+		if (a == null)
+			return NO_ADD;
+		// ignore spotlight
+		Elements spans = a.select("span.card__tag");
+		if (!spans.isEmpty())
+			return NO_ADD;
+		return a.attr("href");
+	}
+	
+	private String getAElementFromListOld(String id, int child_no) throws Exception {
 		Element results = doc.getElementById(id);
 		Element child = results.child(child_no);
 		if (child == null)
