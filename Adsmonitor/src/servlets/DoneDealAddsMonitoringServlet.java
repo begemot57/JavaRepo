@@ -40,7 +40,7 @@ public class DoneDealAddsMonitoringServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String userEmail = request.getParameter("user_email").trim();
+		String userEmail = request.getParameter("user_email").trim().toLowerCase();
 		boolean showAll = (userEmail.equals(SUPER_USER_EMAIL));
 		List<MonitoringJsonObject> monitors = AdsMonitorController.getInstance().getCurrentMonitorsFromFile();
 		if (!showAll)
@@ -61,7 +61,7 @@ public class DoneDealAddsMonitoringServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String userEmail = request.getParameter("user_email");
+		String userEmail = request.getParameter("user_email").trim().toLowerCase();
 		boolean showAll = (userEmail.equals(SUPER_USER_EMAIL));
 		AdsMonitorController controller = AdsMonitorController.getInstance();
 		String value = request.getParameter("value");
