@@ -42,9 +42,9 @@ public class AdsMonitor implements Runnable {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd'_'HH:mm:ss");
 
 	public static void main(String[] args) {
-		String URL = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&price_to=3000&year_from=2003&year_to=2006&price_from=1000&transmission=Automatic";
+//		String URL = "https://www.donedeal.ie/cars/Mercedes-Benz/E-Class?area=Munster&price_to=3000&year_from=2003&year_to=2006&price_from=1000&transmission=Automatic";
 		// String URL = "https://www.donedeal.ie/cars/Audi/A4?year_from=2010";
-		// String URL = "https://www.donedeal.ie/cars/Toyota";
+		 String URL = "https://www.donedeal.ie/cars/Toyota";
 		String frequency = "30";
 		String email = "ioffe.leo@gmail.com";
 		AdsMonitor test = new AdsMonitor("monitor1", URL, email, frequency);
@@ -75,7 +75,7 @@ public class AdsMonitor implements Runnable {
 
 				// try to reach the page five times
 				int count = 0;
-				int maxTries = 10;
+				int maxTries = 30;
 				while (true) {
 					try {
 						if (loadFromFile) {
@@ -91,10 +91,8 @@ public class AdsMonitor implements Runnable {
 					} catch (Exception e) {
 						// handle exception
 						if (++count == maxTries) {
-							logger.log("JSoup has thrown exception " + maxTries + " times");
-							logger.log("VVVVVVVVVVVVVVV");
+							logger.log("JSoup has thrown exception " + maxTries + " times for URL: "+URL);
 							logger.log(e.getMessage());
-							logger.log("^^^^^^^^^^^^^^^");
 							throw e;
 						} else {
 							// logger.log("Jsoup failed monitoring "+URL+"
@@ -182,7 +180,7 @@ public class AdsMonitor implements Runnable {
 		logger.log(fullBody);
 		// try to reach the page five times
 		int count = 0;
-		int maxTries = 10;
+		int maxTries = 30;
 		while (true) {
 			try {
 				SendMailTLS.send(email, subject, fullBody);
@@ -198,7 +196,7 @@ public class AdsMonitor implements Runnable {
 					logger.log(e.getMessage());
 					throw e;
 				} else {
-					Thread.sleep(10000);
+					Thread.sleep(30000);
 				}
 			}
 		}
