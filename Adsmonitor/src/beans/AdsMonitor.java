@@ -207,6 +207,7 @@ public class AdsMonitor implements Runnable {
 		Element results = panel.select("ul").first();
 		//TODO:
 		//this might throw java.lang.IndexOutOfBoundsException in case there are less than 30 ads on the page
+		//or deleted add
 		//unhandled now - gotta take a look at it.
 		Element child = results.child(child_no);
 		if (child == null)
