@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="lib/java-mail-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/jsoup-1.7.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/selenium-java-2.7.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
