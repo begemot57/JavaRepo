@@ -2,6 +2,8 @@ package test.files;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +18,10 @@ import java.util.List;
 public class PrintOutFileNamesInDirRecursively {
 
 	private static String FILE_NAME = ".java";
-	private static String DIR_PATH = "C:/rtc_ws/Tivoli_Analytics_Stream_uServices/src/StreamingAnalyticsLite/test/java";
+	private static String DIR_PATH = "/Users/leonidio/AlbumPics/Fotos_big_hd/Alles";
 	private static int overall_counter = 0;
 	private static List<String> FILES = new ArrayList<>();
-	private static boolean CHECK_DUPLICATES = true;
+	private static boolean CHECK_DUPLICATES = false;
 
 	/**
 	 * @param args
@@ -37,7 +39,7 @@ public class PrintOutFileNamesInDirRecursively {
 			if (file.isDirectory()) {
 				showFiles(file.listFiles()); // Calls same method again.
 			} else {
-				if (file.getName().endsWith(FILE_NAME)) {
+//				if (file.getName().endsWith(FILE_NAME)) {
 					if (CHECK_DUPLICATES) {
 						if (FILES.contains(file.getName())) {
 //							System.out.println("+++++found duplicate: "	+ file.getName());
@@ -51,7 +53,18 @@ public class PrintOutFileNamesInDirRecursively {
 						counter++;
 					}
 					System.out.println(file.getPath());
-				}
+					BasicFileAttributes attr = null;
+					try {
+						attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					System.out.println("creationTime: " + attr.creationTime());
+					System.out.println("lastAccessTime: " + attr.lastAccessTime());
+					System.out.println("lastModifiedTime: " + attr.lastModifiedTime());
+//				}
 			}
 		}
 		if (lastFile != null) {
