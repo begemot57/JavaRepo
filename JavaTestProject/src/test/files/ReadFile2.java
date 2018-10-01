@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
  
-public class CopyOfReadFile {
+public class ReadFile2 {
  
 	public static void main(String[] args) {
  
-		CopyOfReadFile test = new CopyOfReadFile();
+		ReadFile2 test = new ReadFile2();
 		
 //		test.mergeFiles();
 //		test.reorderLines();
